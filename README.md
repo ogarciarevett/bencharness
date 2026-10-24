@@ -2,6 +2,44 @@
 
 Compare agent harnesses on the same tasks, model, memory, and time budget.
 
+## Install
+
+```sh
+pipx install bencharness
+```
+
+Or use uv:
+
+```sh
+uv tool install bencharness
+```
+
+A user-local curl installer:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/ogarciarevett/bencharness/main/install.sh | sh
+```
+
+Homebrew:
+
+```sh
+brew tap ogarciarevett/bencharness https://github.com/ogarciarevett/bencharness && brew install ogarciarevett/bencharness/bencharness
+```
+
+## Verify
+
+```sh
+bench --help
+```
+
+Python 3.9 or newer is required. The first PyPI release awaits the owner's
+[publication step](docs/releasing.md); PyPI and the default curl install become
+available after publication. Homebrew installs the pinned source distribution.
+Installing or invoking `bench` without arguments starts no benchmark.
+`bench --report --workspace PATH` renders saved data without a source checkout.
+Trial commands use `bench --workspace PATH --trial trials/ID.json`, where PATH
+is the source checkout with the pinned assets described below.
+
 <!-- charts:start -->
 ![Recorded benchmark summary](docs/charts/latest/summary.svg)
 
@@ -16,7 +54,7 @@ The featured task is the most recent recorded comparison with a score spread; ti
 
 *Actual output of `python3 -m bench.run --help`; no model call is made.*
 
-## Quick start
+## From source
 
 Clone the repository. The Python runner uses only the standard library; Python 3.12
 is recommended. Reporting works without a model account or external checkouts.
