@@ -7,8 +7,8 @@ jobs:
   test:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.12"
       - run: python -m unittest discover -s tests -v
@@ -21,10 +21,11 @@ jobs:
     runs-on: ubuntu-24.04
     container: python:3.12-slim
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Build the package in a clean container
         run: |
-          python -m pip install build pipx uv
+          python -m pip install "pip @ https://files.pythonhosted.org/packages/3f/06/3e4420302363fbb71be3c7f35ce042f54bfca330e3e66b3a2e3c4cca579f/pip-26.2.2-py3-none-any.whl#sha256=fd7f4dfa8190e014013b9f08f3e973f4e4c26ffd179a204895533a7254813a70"
+          python -m pip install build pipx "certifi>=2026.10.19" "uv>=0.13.4"
           python -m build
       - name: Install and verify isolated commands
         env:
@@ -37,7 +38,7 @@ jobs:
           set -eu
           set -- dist/*.whl
           wheel="$PWD/$1"
-          pipx install --python /usr/local/bin/python "$wheel"
+          pipx install --backend uv --python /usr/local/bin/python "$wheel"
           /tmp/pipx-bin/bench --help
           /tmp/pipx-bin/bench --version
           /tmp/pipx/venvs/bencharness/bin/python -c 'import os; from bench.safety import WRAPPER; assert WRAPPER.is_file() and os.access(WRAPPER, os.X_OK); assert (WRAPPER.parent.parent / "suites/rules/seeds/query-columns/manifest.json").is_file()'
@@ -45,6 +46,7 @@ jobs:
           /tmp/uv-bin/bench --help
           BENCHARNESS_PACKAGE="$wheel" XDG_DATA_HOME=/tmp/curl-data BENCHARNESS_BIN_DIR=/tmp/curl-bin sh install.sh
           /tmp/curl-bin/bench --version
+          /tmp/curl-data/bencharness/venv/bin/python -c 'import pip; assert tuple(map(int, pip.__version__.split("."))) >= (26, 2, 2)'
           mkdir /tmp/report-workspace
           cp README.md /tmp/report-workspace/
           cp -R results /tmp/report-workspace/
@@ -57,7 +59,7 @@ jobs:
     env:
       HOMEBREW_NO_AUTO_UPDATE: "1"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install and test the pinned formula
         run: |
           brew tap-new --no-git local/bencharness

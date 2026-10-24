@@ -32,7 +32,9 @@ brew tap ogarciarevett/bencharness https://github.com/ogarciarevett/bencharness 
 bench --help
 ```
 
-Python 3.9 or newer is required. The first PyPI release awaits the owner's
+Python 3.9 or newer is required for the package; the curl installer requires
+Python 3.10 or newer so it can bootstrap patched pip 26.2.2 by verified hash.
+Use uv 0.13.4 or newer for the uv installation. The first PyPI release awaits the owner's
 [publication step](docs/releasing.md); PyPI and the default curl install become
 available after publication. Homebrew installs the pinned source distribution.
 Installing or invoking `bench` without arguments starts no benchmark.
