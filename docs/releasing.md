@@ -19,6 +19,8 @@ The manual main-only workflow builds a wheel and source distribution, uses
 without stored API tokens, and attaches distributions and SHA-256 checksums to
 the matching GitHub release. The build and publication jobs have separate
 permissions. It refuses a version different from `pyproject.toml`.
+Download the release files into one folder and run `sha256sum -c SHA256SUMS`
+to verify the attached distributions.
 
 Before the first publication, test installation using the locally built wheel;
 the package name on PyPI and the default curl installer become available after

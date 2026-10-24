@@ -51,6 +51,7 @@ jobs:
           cd /tmp
           /tmp/pipx-bin/bench --report --workspace /tmp/report-workspace
           test -s /tmp/report-workspace/docs/charts/latest/summary.svg
+          if /tmp/pipx-bin/bench --queue --workspace /tmp/report-workspace; then exit 1; fi
   homebrew-install:
     runs-on: macos-15
     env:

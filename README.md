@@ -36,6 +36,9 @@ Python 3.9 or newer is required. The first PyPI release awaits the owner's
 [publication step](docs/releasing.md); PyPI and the default curl install become
 available after publication. Homebrew installs the pinned source distribution.
 Installing or invoking `bench` without arguments starts no benchmark.
+`bench --report --workspace PATH` renders saved data without a source checkout.
+Trial commands use `bench --workspace PATH --trial trials/ID.json`, where PATH
+is the source checkout with the pinned assets described below.
 
 <!-- charts:start -->
 ![Recorded benchmark summary](docs/charts/latest/summary.svg)
