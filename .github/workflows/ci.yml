@@ -38,7 +38,7 @@ jobs:
           set -eu
           set -- dist/*.whl
           wheel="$PWD/$1"
-          pipx install --python /usr/local/bin/python "$wheel"
+          pipx install --backend uv --python /usr/local/bin/python "$wheel"
           /tmp/pipx-bin/bench --help
           /tmp/pipx-bin/bench --version
           /tmp/pipx/venvs/bencharness/bin/python -c 'import os; from bench.safety import WRAPPER; assert WRAPPER.is_file() and os.access(WRAPPER, os.X_OK); assert (WRAPPER.parent.parent / "suites/rules/seeds/query-columns/manifest.json").is_file()'
@@ -47,7 +47,6 @@ jobs:
           BENCHARNESS_PACKAGE="$wheel" XDG_DATA_HOME=/tmp/curl-data BENCHARNESS_BIN_DIR=/tmp/curl-bin sh install.sh
           /tmp/curl-bin/bench --version
           /tmp/curl-data/bencharness/venv/bin/python -c 'import pip; assert tuple(map(int, pip.__version__.split("."))) >= (26, 2, 2)'
-          /tmp/pipx/shared/bin/python -c 'import pip; assert tuple(map(int, pip.__version__.split("."))) >= (26, 2, 2)'
           mkdir /tmp/report-workspace
           cp README.md /tmp/report-workspace/
           cp -R results /tmp/report-workspace/
