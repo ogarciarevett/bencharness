@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Template for both user agents (night run, morning review), filled in by schedule/install.sh.
+     The launcher runs the script, which writes its own log under runs/: launchd jobs started as
+     /bin/sh, and log files launchd opens itself, are denied on the external volume. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>REPLACE_LABEL</string>
+  <key>ProgramArguments</key>
+  <array><string>REPLACE_LAUNCHER</string></array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key><string>/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin:REPLACE_HOME/.local/bin:/Applications/Orca.app/Contents/Resources/bin</string>
+    <key>BENCH_PILOT</key><string>REPLACE_PILOT</string>
+    <key>BENCH_HYPERAG</key><string>REPLACE_HYPERAG</string>
+    <key>BENCH_REPORT_TO</key><string>REPLACE_REPORT_TO</string>
+  </dict>
+  <key>StartCalendarInterval</key>
+  <dict><key>Hour</key><integer>REPLACE_HOUR</integer><key>Minute</key><integer>REPLACE_MINUTE</integer></dict>
+  <key>LowPriorityIO</key><true/>
+  <key>Nice</key><integer>10</integer>
+</dict>
+</plist>

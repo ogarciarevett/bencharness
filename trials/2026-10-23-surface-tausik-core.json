@@ -1,0 +1,25 @@
+{
+  "id": "2026-10-23-surface-tausik-core",
+  "suite": "hyperag eval/harness2 dev packs, harness-surface arm (native loop, candidate text harness added)",
+  "harnesses": [
+    "baseline-native",
+    "tausik-core"
+  ],
+  "pins": {
+    "baseline-native": "ac0aba4e",
+    "tausik-core": "d7ae661ffdb15001a963260481492da2968f2bf8"
+  },
+  "sources": {
+    "tausik-core": "https://github.com/Kibertum/tausik-core"
+  },
+  "tasks": [
+    "handoff",
+    "engineering"
+  ],
+  "model": "gpt-6.1-sol",
+  "effort": "medium",
+  "service_tier": "standard",
+  "budget_active_seconds": 1200,
+  "memory": "Hyperag multilingual-e5-small, no reranker, no graph, limit 10",
+  "memory_pin": "22c9746691e9c97dc9f73780a1e53e05e3bd6865"
+}

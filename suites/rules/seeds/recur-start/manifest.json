@@ -1,0 +1,3 @@
+{"id": "recur-start", "pack": "recur",
+ "params": {"keep_rdates": true},
+ "space": {"keep_rdates": [true, false]}}

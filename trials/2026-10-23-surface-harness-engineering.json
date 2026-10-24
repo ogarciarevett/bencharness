@@ -1,0 +1,25 @@
+{
+  "id": "2026-10-23-surface-harness-engineering",
+  "suite": "hyperag eval/harness2 dev packs, harness-surface arm (native loop, candidate text harness added)",
+  "harnesses": [
+    "baseline-native",
+    "harness-engineering"
+  ],
+  "pins": {
+    "baseline-native": "ac0aba4e",
+    "harness-engineering": "d860b4b4729947eb815445f79ed5dacd5955a1a6"
+  },
+  "sources": {
+    "harness-engineering": "https://github.com/lenalab-me/harness-engineering"
+  },
+  "tasks": [
+    "handoff",
+    "engineering"
+  ],
+  "model": "gpt-6.1-sol",
+  "effort": "medium",
+  "service_tier": "standard",
+  "budget_active_seconds": 1200,
+  "memory": "Hyperag multilingual-e5-small, no reranker, no graph, limit 10",
+  "memory_pin": "22c9746691e9c97dc9f73780a1e53e05e3bd6865"
+}

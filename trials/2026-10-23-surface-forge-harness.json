@@ -1,0 +1,25 @@
+{
+  "id": "2026-10-23-surface-forge-harness",
+  "suite": "hyperag eval/harness2 dev packs, harness-surface arm (native loop, candidate text harness added)",
+  "harnesses": [
+    "baseline-native",
+    "forge-harness"
+  ],
+  "pins": {
+    "baseline-native": "ac0aba4e",
+    "forge-harness": "47a840cd5f2627f5314e34e3d88f5d5fd867e0a4"
+  },
+  "sources": {
+    "forge-harness": "https://github.com/chrono-meta/forge-harness"
+  },
+  "tasks": [
+    "handoff",
+    "engineering"
+  ],
+  "model": "gpt-6.1-sol",
+  "effort": "medium",
+  "service_tier": "standard",
+  "budget_active_seconds": 1200,
+  "memory": "Hyperag multilingual-e5-small, no reranker, no graph, limit 10",
+  "memory_pin": "22c9746691e9c97dc9f73780a1e53e05e3bd6865"
+}

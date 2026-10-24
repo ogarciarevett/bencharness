@@ -1,0 +1,3 @@
+{"id": "query-columns", "pack": "query",
+ "params": {"star_only": false},
+ "space": {"star_only": [false, true]}}

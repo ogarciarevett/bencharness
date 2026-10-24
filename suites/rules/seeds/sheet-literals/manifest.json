@@ -1,0 +1,3 @@
+{"id": "sheet-literals", "pack": "sheet",
+ "params": {"default": "0"},
+ "space": {"default": ["0", "\"#VALUE!\""]}}

@@ -1,0 +1,17 @@
+{
+  "id": "2026-10-24-desktop-omnigent",
+  "suite": "One multi-file Tauri2 Rust React work queue with 22 sealed headless integration checks",
+  "harnesses": ["native-codex-app", "omnigent"],
+  "pins": {"native-codex-app": "codex-cli 0.164.0", "omnigent": "65be0f24685b11ad271a903331c03e3d1a408b87"},
+  "sources": {"omnigent": "https://github.com/omnigent-ai/omnigent"},
+  "tasks": ["desktop-queue"],
+  "model": "gpt-6.1-sol", "effort": "medium", "service_tier": "standard",
+  "budget_active_seconds": 1200,
+  "memory": "none: identical fresh repository and prompt",
+  "suite_pin": {"repo": "bencharness", "path": "suites/desktop", "commit": "ea2510aee4588f09484dbc2d851173f8e01f6834"},
+  "tooling_sha256": "c2096ed9e6aaaf5f224c45010387dfab2c766d2058ef63e4188b6efac6fc7c3b",
+  "mode": "repo-app", "report": "different_scores",
+  "paid_usd": 0,
+  "notes": "Unchanged pinned CodexExecutor only, not full Omnigent server. Standard requested; CLI may omit unsupported tier. Offline commands, no devices/windows, subscription only.",
+  "python_sha256": "eb4e9b9c37c7f201d0b4bdf730a4961168078a04fa163ad200434de87ae2c53e"
+}

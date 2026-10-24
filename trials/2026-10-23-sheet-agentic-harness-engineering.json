@@ -1,0 +1,29 @@
+{
+  "id": "2026-10-23-sheet-agentic-harness-engineering",
+  "suite": "bencharness rules suite, sheet task (agentic): full evidence per item, native loop, candidate text harness added",
+  "harnesses": [
+    "baseline-native",
+    "harness-engineering"
+  ],
+  "pins": {
+    "baseline-native": "ac0aba4e",
+    "harness-engineering": "d860b4b4729947eb815445f79ed5dacd5955a1a6"
+  },
+  "sources": {
+    "harness-engineering": "https://github.com/lenalab-me/harness-engineering"
+  },
+  "tasks": [
+    "sheet"
+  ],
+  "model": "gpt-6.1-sol",
+  "effort": "medium",
+  "service_tier": "standard",
+  "budget_active_seconds": 1200,
+  "memory": "none: every item carries its full evidence",
+  "suite_pin": {
+    "repo": "bencharness",
+    "path": "suites/rules",
+    "commit": "6e09e0034826c71d0c217c4893c45e204d02d69c"
+  },
+  "mode": "agentic"
+}

@@ -1,0 +1,29 @@
+{
+  "id": "2026-10-23-rules-forge-harness",
+  "suite": "bencharness rules suite (ledger, merge): full evidence per item, native loop, candidate text harness added",
+  "harnesses": [
+    "baseline-native",
+    "forge-harness"
+  ],
+  "pins": {
+    "baseline-native": "ac0aba4e",
+    "forge-harness": "47a840cd5f2627f5314e34e3d88f5d5fd867e0a4"
+  },
+  "sources": {
+    "forge-harness": "https://github.com/chrono-meta/forge-harness"
+  },
+  "tasks": [
+    "ledger",
+    "merge"
+  ],
+  "model": "gpt-6.1-sol",
+  "effort": "medium",
+  "service_tier": "standard",
+  "budget_active_seconds": 1200,
+  "memory": "none: every item carries its full evidence",
+  "suite_pin": {
+    "repo": "bencharness",
+    "path": "suites/rules",
+    "commit": "7f3963fefd4e458794b15af659785335fea3774b"
+  }
+}

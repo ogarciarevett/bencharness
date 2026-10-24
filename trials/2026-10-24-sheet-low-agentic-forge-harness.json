@@ -1,0 +1,29 @@
+{
+  "id": "2026-10-24-sheet-low-agentic-forge-harness",
+  "suite": "bencharness rules suite, sheet agentic low-effort calibration: full evidence, same task and cap",
+  "harnesses": [
+    "baseline-native",
+    "forge-harness"
+  ],
+  "pins": {
+    "baseline-native": "ac0aba4e",
+    "forge-harness": "47a840cd5f2627f5314e34e3d88f5d5fd867e0a4"
+  },
+  "sources": {
+    "forge-harness": "https://github.com/chrono-meta/forge-harness"
+  },
+  "tasks": [
+    "sheet"
+  ],
+  "model": "gpt-6.1-sol",
+  "effort": "low",
+  "service_tier": "standard",
+  "budget_active_seconds": 1200,
+  "memory": "none: every item carries its full evidence",
+  "suite_pin": {
+    "repo": "bencharness",
+    "path": "suites/rules",
+    "commit": "6e09e0034826c71d0c217c4893c45e204d02d69c"
+  },
+  "mode": "agentic"
+}

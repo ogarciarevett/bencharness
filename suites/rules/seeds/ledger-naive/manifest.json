@@ -1,0 +1,3 @@
+{"id": "ledger-naive", "pack": "ledger",
+ "params": {"count_deposits": true},
+ "space": {"count_deposits": [true, false]}}

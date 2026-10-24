@@ -1,0 +1,3 @@
+{"id": "merge-shallow", "pack": "merge",
+ "params": {"strip_locks": false},
+ "space": {"strip_locks": [false, true]}}

@@ -1,0 +1,23 @@
+{
+  "id": "2026-10-23-hyperag-harness2-arm",
+  "suite": "Saved retrieval evaluation packs",
+  "harnesses": [
+    "baseline",
+    "harness2"
+  ],
+  "pins": {
+    "baseline": "ac0aba4e",
+    "harness2": "1cfe254e"
+  },
+  "tasks": [
+    "handoff",
+    "engineering"
+  ],
+  "model": "gpt-6.1-sol",
+  "effort": "medium",
+  "service_tier": "standard",
+  "k": 1,
+  "budget_active_seconds": 1200,
+  "memory": "Hyperag multilingual-e5-small, no reranker, no graph, limit 10",
+  "notes": "Imported from hyperag eval/harness2/results.json. Compose was a no-op on both tasks; all four final plugins sit at the retrieval ceiling, so the tie shows no harness effect. One trial, 13 sealed items per task."
+}
