@@ -275,14 +275,27 @@ def import_pilot(trial_path, results_path):
     return record(spec, results)
 
 
-if __name__ == "__main__":
+def main(argv=None):
+    global TRIALS, RESULTS, OWNER, RUNS, QUEUE
     parser = argparse.ArgumentParser()
     parser.add_argument("--queue", action="store_true")
     parser.add_argument("--max", type=int, help="with --queue: record at most this many trials")
     parser.add_argument("--trial")
     parser.add_argument("--import", dest="imported", nargs=2, metavar=("TRIAL", "RESULTS"))
     parser.add_argument("--child", nargs=3, help=argparse.SUPPRESS)
-    args = parser.parse_args()
+    parser.add_argument("--workspace", type=Path, help="directory for trial state and saved reports")
+    parser.add_argument("--report", action="store_true", help="regenerate saved charts and tables without running a trial")
+    args = parser.parse_args(argv)
+    if args.workspace:
+        root = args.workspace.resolve()
+        TRIALS, RESULTS = root / "trials", root / "results/trials.jsonl"
+        OWNER, RUNS, QUEUE = root / "queue/needs-owner.jsonl", root / "runs", root / "queue/candidates.jsonl"
+        report.ROOT, report.STORE = root, RESULTS
+    if args.report:
+        if not RESULTS.is_file() or not (report.ROOT / "README.md").is_file():
+            parser.error("reporting needs results/trials.jsonl and README.md in the workspace")
+        report.write()
+        return
     if args.child:
         name, spec, workdir = args.child
         print(json.dumps(adapter(name).run(json.loads(spec), Path(workdir))))
@@ -292,3 +305,7 @@ if __name__ == "__main__":
         run_trial(args.trial)
     else:
         queue(args.max)
+
+
+if __name__ == "__main__":
+    main()
