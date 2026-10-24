@@ -40,6 +40,7 @@ jobs:
           pipx install --python /usr/local/bin/python "$wheel"
           /tmp/pipx-bin/bench --help
           /tmp/pipx-bin/bench --version
+          /tmp/pipx/venvs/bencharness/bin/python -c 'import os; from bench.safety import WRAPPER; assert WRAPPER.is_file() and os.access(WRAPPER, os.X_OK); assert (WRAPPER.parent.parent / "suites/rules/seeds/query-columns/manifest.json").is_file()'
           uv tool install --python /usr/local/bin/python "$wheel"
           /tmp/uv-bin/bench --help
           BENCHARNESS_PACKAGE="$wheel" XDG_DATA_HOME=/tmp/curl-data BENCHARNESS_BIN_DIR=/tmp/curl-bin sh install.sh
@@ -50,3 +51,15 @@ jobs:
           cd /tmp
           /tmp/pipx-bin/bench --report --workspace /tmp/report-workspace
           test -s /tmp/report-workspace/docs/charts/latest/summary.svg
+  homebrew-install:
+    runs-on: macos-15
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install and test the pinned formula
+        run: |
+          brew tap-new --no-git local/bencharness
+          cp Formula/bencharness.rb "$(brew --repository local/bencharness)/Formula/"
+          brew install local/bencharness/bencharness
+          brew test local/bencharness/bencharness
