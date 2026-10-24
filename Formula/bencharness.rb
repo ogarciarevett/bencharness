@@ -3,9 +3,9 @@ class Bencharness < Formula
 
   desc "Compare agent harnesses with scoped, recorded benchmark evidence"
   homepage "https://github.com/ogarciarevett/bencharness"
-  url "https://github.com/ogarciarevett/bencharness/archive/42897df4a02a546b036c39ce746ffa2268083b12.tar.gz"
+  url "https://github.com/ogarciarevett/bencharness/archive/f2d3a1bbc5111830ee663afec7f7c2259da10e93.tar.gz"
   version "0.1.0"
-  sha256 "59d62b2fee3cfce798f3b251e9fa48404ee8fca72c193a8da1a0d923920204f3"
+  sha256 "a4ea6d2b811200c2ec3245310536e63f4eb90f3da9af2a4323a931ccbb6dc320"
   license "Apache-2.0"
 
   depends_on "python@3.12"
@@ -22,5 +22,7 @@ class Bencharness < Formula
   test do
     assert_match "bencharness 0.1.0", shell_output("#{bin}/bench --version")
     assert_match "--report", shell_output("#{bin}/bench --help")
+    assert_match "source checkout", shell_output("#{bin}/bench --queue --workspace #{testpath} 2>&1", 1)
+    assert_match "unrecognized arguments", shell_output("#{bin}/bench --que --workspace #{testpath} 2>&1", 2)
   end
 end
