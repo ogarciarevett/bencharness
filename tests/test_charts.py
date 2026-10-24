@@ -18,6 +18,23 @@ def trial(name="first", date="2026-10-23T19:00:00Z"):
 
 
 class Charts(unittest.TestCase):
+    def test_generated_symlinks_cannot_write_outside_the_gallery(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            outside = root / "outside"
+            outside.write_text("owned sentinel")
+            gallery = root / "charts"
+            (gallery / "latest").mkdir(parents=True)
+            (gallery / "latest/summary.svg").symlink_to(outside)
+            with self.assertRaisesRegex(ValueError, "regular files"):
+                charts.write([trial()], gallery)
+            self.assertEqual(outside.read_text(), "owned sentinel")
+            (gallery / "latest/summary.svg").unlink()
+            (gallery / "linked").symlink_to(root, target_is_directory=True)
+            with self.assertRaisesRegex(ValueError, "regular files"):
+                charts.write([], gallery)
+            self.assertEqual(outside.read_text(), "owned sentinel")
+
     def test_labels_metadata_and_escaping_match_source(self):
         row = trial('<run & "quoted">')
         node = charts.leaderboard(row, "task")

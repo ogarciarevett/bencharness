@@ -5,7 +5,9 @@ import hashlib
 import html
 import json
 import math
+import os
 import re
+import tempfile
 import xml.etree.ElementTree as ET
 
 # Shared calm chart palette: blue, teal, olive, gold, mauve.
@@ -46,9 +48,29 @@ def canvas(title, subtitle, height, source):
 
 
 def save(svg, path):
-    path.parent.mkdir(parents=True, exist_ok=True)
     ET.indent(svg)
-    path.write_text(ET.tostring(svg, encoding="unicode") + "\n")
+    write_file(path, ET.tostring(svg, encoding="unicode") + "\n")
+
+
+def validate_output(directory):
+    paths = [directory, *directory.rglob("*")] if directory.exists() else [directory]
+    for path in paths:
+        if path.is_symlink() or (path.exists() and not path.is_file() and not path.is_dir()):
+            raise ValueError("Generated chart output must contain only regular files and directories")
+
+
+def write_file(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    # Replace the entry atomically rather than following an existing file link.
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w", dir=path.parent, delete=False) as stream:
+            temporary = stream.name
+            stream.write(text)
+        os.replace(temporary, path)
+    finally:
+        if temporary and os.path.exists(temporary):
+            os.unlink(temporary)
 
 
 def stamp(row):
@@ -160,6 +182,7 @@ def summary(rows):
 
 def write(rows, directory):
     """Backfill per-trial images and refresh latest charts; return README fragments."""
+    validate_output(directory)
     directory.mkdir(parents=True, exist_ok=True)
     if not rows:
         for path in directory.rglob("*"):
@@ -186,7 +209,7 @@ def write(rows, directory):
             images.append(f"![Recorded task leaderboard]({name})")
         page = target / "README.md"
         title = html.escape(row['trial']).replace("[", "\\[").replace("]", "\\]")
-        page.write_text(f"# {title}\n\n" + "\n\n".join(images) +
+        write_file(page, f"# {title}\n\n" + "\n\n".join(images) +
                         "\n\nOne recorded trial. [Raw data and settings](../../../../results/trials.jsonl).\n")
         expected.add(page)
         links.append(f"- [{title}](runs/{slug(row['trial'])}/README.md)")
@@ -205,7 +228,7 @@ def write(rows, directory):
         output(trend(rows, harness), directory / name)
         gallery.append(f"![Recorded harness score history]({name})")
     page = directory / "README.md"
-    page.write_text("# Recorded charts\n\nEach leaderboard uses the latest recorded trial containing that task; different charts can describe different experiments.\n\n" +
+    write_file(page, "# Recorded charts\n\nEach leaderboard uses the latest recorded trial containing that task; different charts can describe different experiments.\n\n" +
                     "\n\n".join(gallery) + "\n\n## Older runs\n\n" + "\n".join(links) +
                     "\n\n[Raw records](../../results/trials.jsonl) · [Tables and notes](../../RESULTS.md)\n")
     expected.add(page)
