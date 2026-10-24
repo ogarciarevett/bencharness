@@ -23,6 +23,11 @@ def show(ref, path):
 ALLOWED = {"results/trials.jsonl", "queue/candidates.jsonl", "RESULTS.md", "README.md"}
 
 
+def allowed(path):
+    return path in ALLOWED or (path.startswith("docs/charts/") and
+                              (path.endswith(".svg") or Path(path).name == "README.md"))
+
+
 def changed_files(base, head):
     done = subprocess.run(["git", "-C", str(ROOT), "diff", "--name-only", f"{base}...{head}"], capture_output=True, text=True, check=True)
     return set(done.stdout.split())
@@ -70,17 +75,31 @@ def check_labels(records, head):
 
 
 def check_generated(head):
+    from bench import charts
     with tempfile.TemporaryDirectory() as tmp:
         archive = subprocess.run(["git", "-C", str(ROOT), "archive", head], capture_output=True, check=True).stdout
         subprocess.run(["tar", "-x", "-C", tmp], input=archive, check=True)
-        before = {name: (Path(tmp) / name).read_text() for name in ("RESULTS.md", "README.md")}
+        try:
+            charts.validate_output(Path(tmp) / "docs/charts")
+            for name in ("RESULTS.md", "README.md"):
+                path = Path(tmp) / name
+                if path.is_symlink() or not path.is_file():
+                    raise ValueError("Generated report must be a regular file")
+        except ValueError as error:
+            return [str(error)]
+        def generated():
+            paths = [Path(tmp) / name for name in ("RESULTS.md", "README.md")]
+            paths += [p for p in (Path(tmp) / "docs/charts").rglob("*") if p.is_file()]
+            return {str(p.relative_to(tmp)): p.read_bytes() for p in paths}
+        before = generated()
         subprocess.run([sys.executable, "-m", "bench.report"], cwd=tmp, check=True)
-        return [f"{name} does not match bench.report output" for name, text in before.items()
-                if (Path(tmp) / name).read_text() != text]
+        after = generated()
+        return [f"{name} does not match bench.report output" for name in sorted(before.keys() | after.keys())
+                if before.get(name) != after.get(name)]
 
 
 def main(base, head, runs, any_files=False):
-    outside = sorted(changed_files(base, head) - ALLOWED)
+    outside = sorted(path for path in changed_files(base, head) if not allowed(path))
     # Never run code from a PR that changes code; --any-files is for a person checking a code PR's records.
     if outside and not any_files:
         print("FAIL: the PR changes files a nightly PR may not touch: " + ", ".join(outside))

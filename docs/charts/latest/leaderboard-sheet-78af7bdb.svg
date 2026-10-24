@@ -1,0 +1,26 @@
+<svg aria-labelledby="title description" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 244" role="img">
+  <title id="title">sheet · recorded leaderboard</title>
+  <desc id="description">2026-10-23-sheet-agentic-harness-engineering</desc>
+  <metadata>{"bench": "BENCH model=gpt-6.1-sol medium standard tier, A=baseline-native@ac0aba4e, B=harness-engineering@d860b4b4729947eb815445f79ed5dacd5955a1a6 mode=agentic, 1200 active s per task side", "memory": "none: every item carries its full evidence", "memory_pin": null, "notes": "", "recorded_utc": "2026-10-23T21:26:15+00:00", "suite": "bencharness rules suite, sheet task (agentic): full evidence per item, native loop, candidate text harness added", "tasks": {"sheet": {"results": {"baseline-native": {"agent_calls": 1, "cap_seconds": 1200, "cost_estimate_usd": 0.146816, "hard_failure": null, "harness": "baseline-native", "mode": "agentic", "model_calls": 1, "pack": "sheet", "pass": true, "pass_score": 0.95, "plugin_sha256": "30608e5f01145ab5de15e31b32697c0fac8420e4bfb576577ef907e421709f6e", "score": 1.0, "sealed_items": 38, "selection": "pilot-proposal", "status": "complete", "usage": {"cache_write_input_tokens": 0, "cached_input_tokens": 197504, "input_tokens": 224147, "output_tokens": 7378, "reasoning_output_tokens": 913}, "visible_pass": true, "wall_seconds": 143.914}, "harness-engineering": {"agent_calls": 1, "cap_seconds": 1200, "cost_estimate_usd": 0.155694, "hard_failure": null, "harness": "harness-engineering", "mode": "agentic", "model_calls": 1, "pack": "sheet", "pass": true, "pass_score": 0.95, "plugin_sha256": "0426d96666510c52f4e04f4d054e62fb8c45d44aff0d57d130a95537d5602efd", "score": 1.0, "sealed_items": 38, "selection": "pilot-proposal", "status": "complete", "usage": {"cache_write_input_tokens": 0, "cached_input_tokens": 194816, "input_tokens": 226507, "output_tokens": 7283, "reasoning_output_tokens": 549}, "visible_pass": true, "wall_seconds": 166.203}}, "verdict": "tie"}}, "trial": "2026-10-23-sheet-agentic-harness-engineering"}</metadata>
+  <style>text{font:16px system-ui,sans-serif;fill:#59636e}.title{font-size:24px;font-weight:650;fill:#24292f}.small{font-size:13px}.grid{stroke:#8b949e;stroke-opacity:.28}@media(prefers-color-scheme:dark){text{fill:#a1a7b3}.title{fill:#e6edf3}}</style>
+  <text x="28" y="38" class="title">sheet · recorded leaderboard</text>
+  <text x="28" y="65" class="small">2026-10-23-sheet-agentic-harness-engineering</text>
+  <line x1="270.0" x2="270.0" y1="85" y2="199" class="grid" />
+  <text x="270.0" y="223" text-anchor="middle" class="small">0.00</text>
+  <line x1="412.5" x2="412.5" y1="85" y2="199" class="grid" />
+  <text x="412.5" y="223" text-anchor="middle" class="small">0.25</text>
+  <line x1="555.0" x2="555.0" y1="85" y2="199" class="grid" />
+  <text x="555.0" y="223" text-anchor="middle" class="small">0.50</text>
+  <line x1="697.5" x2="697.5" y1="85" y2="199" class="grid" />
+  <text x="697.5" y="223" text-anchor="middle" class="small">0.75</text>
+  <line x1="840.0" x2="840.0" y1="85" y2="199" class="grid" />
+  <text x="840.0" y="223" text-anchor="middle" class="small">1.00</text>
+  <text x="28" y="114">baseline-native<title>baseline-native</title>
+  </text>
+  <rect x="270" y="94" width="570.0" height="26" fill="#8b915c" />
+  <text x="922" y="114" text-anchor="end">1.0000</text>
+  <text x="28" y="166">harness-engineering<title>harness-engineering</title>
+  </text>
+  <rect x="270" y="146" width="570.0" height="26" fill="#55958c" />
+  <text x="922" y="166" text-anchor="end">1.0000</text>
+</svg>

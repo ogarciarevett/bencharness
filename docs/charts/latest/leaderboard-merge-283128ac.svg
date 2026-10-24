@@ -1,0 +1,26 @@
+<svg aria-labelledby="title description" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 244" role="img">
+  <title id="title">merge · recorded leaderboard</title>
+  <desc id="description">2026-10-23-rules-forge-harness</desc>
+  <metadata>{"bench": "BENCH model=gpt-6.1-sol medium standard tier, A=baseline-native@ac0aba4e, B=forge-harness@47a840cd5f2627f5314e34e3d88f5d5fd867e0a4, 1200 active s per task side", "memory": "none: every item carries its full evidence", "memory_pin": null, "notes": "", "recorded_utc": "2026-10-23T20:42:12+00:00", "suite": "bencharness rules suite (ledger, merge): full evidence per item, native loop, candidate text harness added", "tasks": {"ledger": {"results": {"baseline-native": {"cap_seconds": 1200, "cost_estimate_usd": 0.095854, "hard_failure": null, "harness": "baseline-native", "model_calls": 1, "pack": "ledger", "pass": true, "pass_score": 0.95, "plugin_sha256": "aedce99ea83532ab229ad662c16d84ae32369ef230e581a9f344387e3fabef76", "score": 1.0, "sealed_items": 46, "selection": "pilot-proposal", "status": "complete", "usage": {"cache_write_input_tokens": 0, "cached_input_tokens": 145024, "input_tokens": 172800, "output_tokens": 2580, "reasoning_output_tokens": 176}, "wall_seconds": 64.646}, "forge-harness": {"cap_seconds": 1200, "cost_estimate_usd": 0.091729, "hard_failure": null, "harness": "forge-harness", "model_calls": 1, "pack": "ledger", "pass": true, "pass_score": 0.95, "plugin_sha256": "a1d2ce0ec425b0b0311605a22b0e0707ed6291e64b69ef08bed43c9c35d415cd", "score": 1.0, "sealed_items": 46, "selection": "pilot-proposal", "status": "complete", "usage": {"cache_write_input_tokens": 0, "cached_input_tokens": 165632, "input_tokens": 192095, "output_tokens": 2224, "reasoning_output_tokens": 158}, "wall_seconds": 54.138}}, "verdict": "tie"}, "merge": {"results": {"baseline-native": {"cap_seconds": 1200, "cost_estimate_usd": 0.065821, "hard_failure": null, "harness": "baseline-native", "model_calls": 1, "pack": "merge", "pass": true, "pass_score": 0.95, "plugin_sha256": "52db6910c486f9bf7ae351e2fafeae9c0ea7fac64788d1bcc2e45e4ce4b508c6", "score": 1.0, "sealed_items": 44, "selection": "pilot-proposal", "status": "complete", "usage": {"cache_write_input_tokens": 0, "cached_input_tokens": 82688, "input_tokens": 101799, "output_tokens": 1933, "reasoning_output_tokens": 246}, "wall_seconds": 49.226}, "forge-harness": {"cap_seconds": 1200, "cost_estimate_usd": 0.076053, "hard_failure": null, "harness": "forge-harness", "model_calls": 1, "pack": "merge", "pass": true, "pass_score": 0.95, "plugin_sha256": "80ee15a813fecfc8a6809864100c266045673661a6423bff4728c868c8bff811", "score": 1.0, "sealed_items": 44, "selection": "pilot-proposal", "status": "complete", "usage": {"cache_write_input_tokens": 0, "cached_input_tokens": 122368, "input_tokens": 145516, "output_tokens": 1752, "reasoning_output_tokens": 259}, "wall_seconds": 52.744}}, "verdict": "tie"}}, "trial": "2026-10-23-rules-forge-harness"}</metadata>
+  <style>text{font:16px system-ui,sans-serif;fill:#59636e}.title{font-size:24px;font-weight:650;fill:#24292f}.small{font-size:13px}.grid{stroke:#8b949e;stroke-opacity:.28}@media(prefers-color-scheme:dark){text{fill:#a1a7b3}.title{fill:#e6edf3}}</style>
+  <text x="28" y="38" class="title">merge · recorded leaderboard</text>
+  <text x="28" y="65" class="small">2026-10-23-rules-forge-harness</text>
+  <line x1="270.0" x2="270.0" y1="85" y2="199" class="grid" />
+  <text x="270.0" y="223" text-anchor="middle" class="small">0.00</text>
+  <line x1="412.5" x2="412.5" y1="85" y2="199" class="grid" />
+  <text x="412.5" y="223" text-anchor="middle" class="small">0.25</text>
+  <line x1="555.0" x2="555.0" y1="85" y2="199" class="grid" />
+  <text x="555.0" y="223" text-anchor="middle" class="small">0.50</text>
+  <line x1="697.5" x2="697.5" y1="85" y2="199" class="grid" />
+  <text x="697.5" y="223" text-anchor="middle" class="small">0.75</text>
+  <line x1="840.0" x2="840.0" y1="85" y2="199" class="grid" />
+  <text x="840.0" y="223" text-anchor="middle" class="small">1.00</text>
+  <text x="28" y="114">baseline-native<title>baseline-native</title>
+  </text>
+  <rect x="270" y="94" width="570.0" height="26" fill="#8b915c" />
+  <text x="922" y="114" text-anchor="end">1.0000</text>
+  <text x="28" y="166">forge-harness<title>forge-harness</title>
+  </text>
+  <rect x="270" y="146" width="570.0" height="26" fill="#8b915c" />
+  <text x="922" y="166" text-anchor="end">1.0000</text>
+</svg>

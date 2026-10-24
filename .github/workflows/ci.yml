@@ -12,5 +12,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m unittest discover -s tests -v
-      - name: RESULTS.md matches the store
-        run: python -m bench.report && git diff --exit-code RESULTS.md README.md
+      - name: Reports and charts match the store
+        run: |
+          python -m bench.report
+          git diff --exit-code RESULTS.md README.md docs/charts
+          test -z "$(git ls-files --others --exclude-standard -- docs/charts)"

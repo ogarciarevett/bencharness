@@ -1,0 +1,26 @@
+<svg aria-labelledby="title description" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 244" role="img">
+  <title id="title">engineering · recorded leaderboard</title>
+  <desc id="description">2026-10-23-surface-harness-engineering</desc>
+  <metadata>{"bench": "BENCH model=gpt-6.1-sol medium standard tier, A=baseline-native@ac0aba4e, B=harness-engineering@d860b4b4729947eb815445f79ed5dacd5955a1a6, 1200 active s per task side", "memory": "Hyperag multilingual-e5-small, no reranker, no graph, limit 10", "notes": "", "recorded_utc": "2026-10-23T20:31:20+00:00", "suite": "hyperag eval/harness2 dev packs, harness-surface arm (native loop, candidate text harness added)", "tasks": {"engineering": {"results": {"baseline-native": {"cap_seconds": 1200, "cost_estimate_usd": 0.122902, "hard_failure": null, "harness": "baseline-native", "model_calls": 1, "pack": "engineering", "pass": false, "pass_score": 0.95, "plugin_sha256": "0eb53b7b03a387a4d11ef1621840676ea314d899f24723468dd0b75c59b625fb", "score": 0.7948717948717949, "sealed_items": 13, "selection": "pilot-proposal", "status": "complete", "usage": {"cache_write_input_tokens": 0, "cached_input_tokens": 205824, "input_tokens": 243404, "output_tokens": 2716, "reasoning_output_tokens": 500}, "wall_seconds": 66.115}, "harness-engineering": {"cap_seconds": 1200, "cost_estimate_usd": 0.130944, "hard_failure": null, "harness": "harness-engineering", "model_calls": 1, "pack": "engineering", "pass": false, "pass_score": 0.95, "plugin_sha256": "d63e2edcf421cae6467abfd277be55a1bbace7b34a3ed1aa2a0504e05a01521f", "score": 0.7948717948717949, "sealed_items": 13, "selection": "pilot-proposal", "status": "complete", "usage": {"cache_write_input_tokens": 0, "cached_input_tokens": 173440, "input_tokens": 214450, "output_tokens": 3158, "reasoning_output_tokens": 582}, "wall_seconds": 86.042}}, "verdict": "tie"}, "handoff": {"results": {"baseline-native": {"cap_seconds": 1200, "cost_estimate_usd": 0.133052, "hard_failure": null, "harness": "baseline-native", "model_calls": 1, "pack": "handoff", "pass": false, "pass_score": 0.95, "plugin_sha256": "84a824f79d0672528e06e7f44901576ddb25997e2086eee1437bc21698ebf47e", "score": 0.7358974358974358, "sealed_items": 13, "selection": "pilot-proposal", "status": "complete", "usage": {"cache_write_input_tokens": 0, "cached_input_tokens": 186240, "input_tokens": 228224, "output_tokens": 3046, "reasoning_output_tokens": 207}, "wall_seconds": 63.991}, "harness-engineering": {"cap_seconds": 1200, "cost_estimate_usd": 0.104707, "hard_failure": null, "harness": "harness-engineering", "model_calls": 1, "pack": "handoff", "pass": false, "pass_score": 0.95, "plugin_sha256": "6b6d76b25b13e2511be1688e9ef7f1fa926cf8aa92b650e3f74263c3781fe5c3", "score": 0.7358974358974358, "sealed_items": 13, "selection": "pilot-proposal", "status": "complete", "usage": {"cache_write_input_tokens": 0, "cached_input_tokens": 225408, "input_tokens": 252731, "output_tokens": 2752, "reasoning_output_tokens": 173}, "wall_seconds": 69.366}}, "verdict": "tie"}}, "trial": "2026-10-23-surface-harness-engineering"}</metadata>
+  <style>text{font:16px system-ui,sans-serif;fill:#59636e}.title{font-size:24px;font-weight:650;fill:#24292f}.small{font-size:13px}.grid{stroke:#8b949e;stroke-opacity:.28}@media(prefers-color-scheme:dark){text{fill:#a1a7b3}.title{fill:#e6edf3}}</style>
+  <text x="28" y="38" class="title">engineering · recorded leaderboard</text>
+  <text x="28" y="65" class="small">2026-10-23-surface-harness-engineering</text>
+  <line x1="270.0" x2="270.0" y1="85" y2="199" class="grid" />
+  <text x="270.0" y="223" text-anchor="middle" class="small">0.00</text>
+  <line x1="412.5" x2="412.5" y1="85" y2="199" class="grid" />
+  <text x="412.5" y="223" text-anchor="middle" class="small">0.25</text>
+  <line x1="555.0" x2="555.0" y1="85" y2="199" class="grid" />
+  <text x="555.0" y="223" text-anchor="middle" class="small">0.50</text>
+  <line x1="697.5" x2="697.5" y1="85" y2="199" class="grid" />
+  <text x="697.5" y="223" text-anchor="middle" class="small">0.75</text>
+  <line x1="840.0" x2="840.0" y1="85" y2="199" class="grid" />
+  <text x="840.0" y="223" text-anchor="middle" class="small">1.00</text>
+  <text x="28" y="114">baseline-native<title>baseline-native</title>
+  </text>
+  <rect x="270" y="94" width="453.0769230769231" height="26" fill="#8b915c" />
+  <text x="922" y="114" text-anchor="end">0.7949</text>
+  <text x="28" y="166">harness-engineering<title>harness-engineering</title>
+  </text>
+  <rect x="270" y="146" width="453.0769230769231" height="26" fill="#55958c" />
+  <text x="922" y="166" text-anchor="end">0.7949</text>
+</svg>
