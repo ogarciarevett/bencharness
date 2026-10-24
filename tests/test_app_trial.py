@@ -21,12 +21,13 @@ class AppTrialState(unittest.TestCase):
             with self.assertRaises(ValueError):app_trial.directory(root/'alias/app')
 
     def test_dependency_fingerprint_refuses_external_symlinks(self):
-        with tempfile.TemporaryDirectory() as tmp:
+        with tempfile.TemporaryDirectory() as tmp, tempfile.TemporaryDirectory() as external:
             root=Path(tmp).resolve();(root/'.rust-deps').mkdir();(root/'.rust-deps/a.rlib').write_bytes(b'rlib')
             for name in ['package.json','package-lock.json','src-tauri/Cargo.lock']:
                 p=root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text('{}')
             (root/'src-tauri/target').mkdir()
-            (root/'node_modules').mkdir();(root/'node_modules/outside').symlink_to('/private/etc/passwd')
+            outside=Path(external)/'dependency';outside.write_text('external fixture')
+            (root/'node_modules').mkdir();(root/'node_modules/outside').symlink_to(outside)
             with self.assertRaisesRegex(ValueError,'escapes'):app_trial.fingerprint(root)
 
     def test_host_pause_is_not_scored_as_submission_failure(self):
