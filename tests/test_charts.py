@@ -18,6 +18,13 @@ def trial(name="first", date="2026-10-23T19:00:00Z"):
 
 
 class Charts(unittest.TestCase):
+    def test_preview_prefers_recent_real_spread_over_newer_ties(self):
+        spread = trial("spread")
+        spread["tasks"]["task"]["results"]["other"]["score"] = .71
+        tie = trial("newer tie", "2026-10-24T19:00:00Z")
+        self.assertEqual(charts.featured([spread, tie]), (spread, "task"))
+        self.assertEqual(charts.featured([tie]), (tie, "task"))
+
     def test_generated_symlinks_cannot_write_outside_the_gallery(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

@@ -5,7 +5,9 @@ Compare agent harnesses on the same tasks, model, memory, and time budget.
 <!-- charts:start -->
 ![Recorded benchmark summary](docs/charts/latest/summary.svg)
 
-![Latest recorded task leaderboard](docs/charts/latest/leaderboard-sheet-78af7bdb.svg)
+![Recent task comparison](docs/charts/runs/2026-10-23-surface-forge-harness-c8e93e92/leaderboard-handoff-249215fe.svg)
+
+The featured task is the most recent recorded comparison with a score spread; ties appear in the full gallery. If every comparison ties, the latest task is shown. Each chart retains its own experiment scope.
 
 [All task leaderboards, harness trends and older runs](docs/charts/README.md) · [Raw records](results/trials.jsonl)
 <!-- charts:end -->

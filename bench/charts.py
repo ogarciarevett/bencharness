@@ -180,6 +180,19 @@ def summary(rows):
     return svg
 
 
+def featured(rows):
+    """Prefer the newest scored comparison with a spread, without pooling trials."""
+    for row in reversed(rows):
+        spreads = []
+        for task, entry in row["tasks"].items():
+            values = [value for result in entry["results"].values() if (value := score(result)) is not None]
+            if len(values) > 1 and max(values) > min(values):
+                spreads.append((max(values)-min(values), task))
+        if spreads:
+            return row, max(spreads)[1]
+    return rows[-1], sorted(rows[-1]["tasks"])[0]
+
+
 def write(rows, directory):
     """Backfill per-trial images and refresh latest charts; return README fragments."""
     validate_output(directory)
@@ -214,6 +227,10 @@ def write(rows, directory):
         expected.add(page)
         links.append(f"- [{title}](runs/{slug(row['trial'])}/README.md)")
     top = ["![Recorded benchmark summary](docs/charts/latest/summary.svg)"]
+    selected, selected_task = featured(rows)
+    top.append(f"![Recent task comparison](docs/charts/runs/{slug(selected['trial'])}/leaderboard-{slug(selected_task)}.svg)")
+    top.append("The featured task is the most recent recorded comparison with a score spread; ties appear in the full gallery. "
+               "If every comparison ties, the latest task is shown. Each chart retains its own experiment scope.")
     gallery = []
     tasks = sorted({task for row in rows for task in row["tasks"]})
     for task in tasks:
@@ -221,8 +238,6 @@ def write(rows, directory):
         name = f"latest/leaderboard-{slug(task)}.svg"
         output(leaderboard(row, task), directory / name)
         gallery.append(f"![Latest recorded task leaderboard]({name})")
-        if row is rows[-1]:
-            top.append(f"![Latest recorded task leaderboard](docs/charts/{name})")
     for harness in sorted({h for row in rows for entry in row["tasks"].values() for h in entry["results"]}):
         name = f"latest/trend-{slug(harness)}.svg"
         output(trend(rows, harness), directory / name)

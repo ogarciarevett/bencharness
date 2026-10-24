@@ -11,6 +11,8 @@ and the JSONL source. Nightly publishing includes the generated directory; its
 verification and CI reject modified, missing or stale images. Different leaderboards may describe different experiments;
 they are never pooled into one ranking. Lines connect matching task, suite,
 memory and execution settings only. Missing scores have no bar or zero point.
+The README leads with the cross-task summary, then the most recent task with a
+real score spread. If every comparison ties, it shows the latest task instead.
 
 SVGs use a transparent background and light/dark text styles. Series use a calm
 blue, teal, olive, gold and mauve palette with neutral text and guides. All scored
