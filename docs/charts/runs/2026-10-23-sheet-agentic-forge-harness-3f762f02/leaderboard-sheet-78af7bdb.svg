@@ -1,0 +1,26 @@
+<svg aria-labelledby="title description" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 244" role="img">
+  <title id="title">sheet · recorded leaderboard</title>
+  <desc id="description">2026-10-23-sheet-agentic-forge-harness</desc>
+  <metadata>{"bench": "BENCH model=gpt-6.1-sol medium standard tier, A=baseline-native@ac0aba4e, B=forge-harness@47a840cd5f2627f5314e34e3d88f5d5fd867e0a4 mode=agentic, 1200 active s per task side", "memory": "none: every item carries its full evidence", "memory_pin": null, "notes": "", "recorded_utc": "2026-10-23T21:16:35+00:00", "suite": "bencharness rules suite, sheet task (agentic): full evidence per item, native loop, candidate text harness added", "tasks": {"sheet": {"results": {"baseline-native": {"agent_calls": 1, "cap_seconds": 1200, "cost_estimate_usd": 0.153992, "hard_failure": null, "harness": "baseline-native", "mode": "agentic", "model_calls": 1, "pack": "sheet", "pass": true, "pass_score": 0.95, "plugin_sha256": "84982f122c65d1024cfdb077d0ca5a7a46450b584a5987302a1b8704d0f0807e", "score": 1.0, "sealed_items": 38, "selection": "pilot-proposal", "status": "complete", "usage": {"cache_write_input_tokens": 0, "cached_input_tokens": 110720, "input_tokens": 150515, "output_tokens": 6333, "reasoning_output_tokens": 426}, "visible_pass": true, "wall_seconds": 118.173}, "forge-harness": {"agent_calls": 1, "cap_seconds": 1200, "cost_estimate_usd": 0.151058, "hard_failure": null, "harness": "forge-harness", "mode": "agentic", "model_calls": 1, "pack": "sheet", "pass": true, "pass_score": 0.95, "plugin_sha256": "89eda2655b53bc897fc672c2380ef3f3de11387e93b5ad044752b3ee52b5cf64", "score": 1.0, "sealed_items": 38, "selection": "pilot-proposal", "status": "complete", "usage": {"cache_write_input_tokens": 0, "cached_input_tokens": 168064, "input_tokens": 206030, "output_tokens": 5832, "reasoning_output_tokens": 235}, "visible_pass": true, "wall_seconds": 104.922}}, "verdict": "tie"}}, "trial": "2026-10-23-sheet-agentic-forge-harness"}</metadata>
+  <style>text{font:16px system-ui,sans-serif;fill:#59636e}.title{font-size:24px;font-weight:650;fill:#24292f}.small{font-size:13px}.grid{stroke:#8b949e;stroke-opacity:.28}@media(prefers-color-scheme:dark){text{fill:#a1a7b3}.title{fill:#e6edf3}}</style>
+  <text x="28" y="38" class="title">sheet · recorded leaderboard</text>
+  <text x="28" y="65" class="small">2026-10-23-sheet-agentic-forge-harness</text>
+  <line x1="270.0" x2="270.0" y1="85" y2="199" class="grid" />
+  <text x="270.0" y="223" text-anchor="middle" class="small">0.00</text>
+  <line x1="412.5" x2="412.5" y1="85" y2="199" class="grid" />
+  <text x="412.5" y="223" text-anchor="middle" class="small">0.25</text>
+  <line x1="555.0" x2="555.0" y1="85" y2="199" class="grid" />
+  <text x="555.0" y="223" text-anchor="middle" class="small">0.50</text>
+  <line x1="697.5" x2="697.5" y1="85" y2="199" class="grid" />
+  <text x="697.5" y="223" text-anchor="middle" class="small">0.75</text>
+  <line x1="840.0" x2="840.0" y1="85" y2="199" class="grid" />
+  <text x="840.0" y="223" text-anchor="middle" class="small">1.00</text>
+  <text x="28" y="114">baseline-native<title>baseline-native</title>
+  </text>
+  <rect x="270" y="94" width="570.0" height="26" fill="#8b915c" />
+  <text x="922" y="114" text-anchor="end">1.0000</text>
+  <text x="28" y="166">forge-harness<title>forge-harness</title>
+  </text>
+  <rect x="270" y="146" width="570.0" height="26" fill="#8b915c" />
+  <text x="922" y="166" text-anchor="end">1.0000</text>
+</svg>

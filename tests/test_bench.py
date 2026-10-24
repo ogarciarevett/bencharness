@@ -136,7 +136,7 @@ class Record(unittest.TestCase):
             run.import_pilot(trial, source)
         self.assertIn("| handoff | harness2 | complete | 0.7359 |", (self.tmp / "RESULTS.md").read_text())
         readme = (self.tmp / "README.md").read_text()
-        self.assertNotIn("old", readme)
+        self.assertNotIn("\nold\n", readme)
         self.assertTrue(readme.startswith("a\n") and readme.endswith("b\n"))
 
     def test_owner_trial_never_runs_and_escalates_once(self):

@@ -27,8 +27,8 @@ git -C "$tree" reset -q --hard origin/main && git -C "$tree" checkout -q -B "$br
 cd "$tree" || fail "cd $tree"
 python3 -m bench.research || fail "research"
 python3 -m bench.run --queue --max 1 || fail "trial runner"
-[ -n "$(git status --porcelain -- results queue RESULTS.md README.md)" ] || { echo "nothing new"; exit 0; }
-git add results queue RESULTS.md README.md
+[ -n "$(git status --porcelain -- results queue RESULTS.md README.md docs/charts)" ] || { echo "nothing new"; exit 0; }
+git add results queue RESULTS.md README.md docs/charts
 git commit -qm "nightly: records and candidates of $(date -u +%F)" || fail "commit"
 git push -q -u origin "$branch" || fail "push $branch"
 gh pr create --repo "$slug" --head "$branch" --title "nightly: $(date -u +%F)" \

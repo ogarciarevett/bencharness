@@ -1,0 +1,15 @@
+<svg aria-labelledby="title description" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 210" role="img">
+  <title id="title">Recorded benchmark summary</title>
+  <desc id="description">Saved observations only · no pooled ranking across different tasks or settings</desc>
+  <metadata>[{"bench": "BENCH model=gpt-6.1-sol medium standard tier, A=baseline-native@ac0aba4e, B=tausik-core@d7ae661ffdb15001a963260481492da2968f2bf8 mode=agentic, 1200 active s per task side", "memory": "none: every item carries its full evidence", "memory_pin": null, "notes": "", "recorded_utc": "2026-10-23T21:21:00+00:00", "suite": "bencharness rules suite, sheet task (agentic): full evidence per item, native loop, candidate text harness added", "tasks": {"sheet": {"results": {"baseline-native": {"agent_calls": 1, "cap_seconds": 1200, "cost_estimate_usd": 0.13029, "hard_failure": null, "harness": "baseline-native", "mode": "agentic", "model_calls": 1, "pack": "sheet", "pass": true, "pass_score": 0.95, "plugin_sha256": "1ea6420cba361d62fbb16c46a48c90f6f4bba7f263b077be62d12d93d693c1e8", "score": 1.0, "sealed_items": 38, "selection": "pilot-proposal", "status": "complete", "usage": {"cache_write_input_tokens": 0, "cached_input_tokens": 161536, "input_tokens": 187194, "output_tokens": 6282, "reasoning_output_tokens": 350}, "visible_pass": true, "wall_seconds": 121.32}, "tausik-core": {"agent_calls": 1, "cap_seconds": 1200, "cost_estimate_usd": 0.161722, "hard_failure": null, "harness": "tausik-core", "mode": "agentic", "model_calls": 1, "pack": "sheet", "pass": true, "pass_score": 0.95, "plugin_sha256": "311e7294f08b3db98d778672ee0fbb695a620dd59a4c4d1e5416a9a2534f7a2d", "score": 1.0, "sealed_items": 38, "selection": "pilot-proposal", "status": "complete", "usage": {"cache_write_input_tokens": 0, "cached_input_tokens": 203520, "input_tokens": 236905, "output_tokens": 7460, "reasoning_output_tokens": 609}, "visible_pass": true, "wall_seconds": 138.901}}, "verdict": "tie"}}, "trial": "2026-10-23-sheet-agentic-tausik-core"}]</metadata>
+  <style>text{font:16px system-ui,sans-serif;fill:#59636e}.title{font-size:24px;font-weight:650;fill:#24292f}.small{font-size:13px}.grid{stroke:#8b949e;stroke-opacity:.28}@media(prefers-color-scheme:dark){text{fill:#a1a7b3}.title{fill:#e6edf3}}</style>
+  <text x="28" y="38" class="title">Recorded benchmark summary</text>
+  <text x="28" y="65" class="small">Saved observations only · no pooled ranking across different tasks or settings</text>
+  <text x="28" y="125" class="title">1</text>
+  <text x="28" y="157">recorded trials</text>
+  <text x="335" y="125" class="title">2 / 2</text>
+  <text x="335" y="157">scored / recorded results</text>
+  <text x="665" y="125" class="title">2026-10-23</text>
+  <text x="665" y="157">latest recorded date (UTC)</text>
+  <text x="28" y="193" class="small">Exploratory trials; no repeated-run confidence intervals. Full settings and notes remain in the raw records.</text>
+</svg>
