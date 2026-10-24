@@ -11,7 +11,7 @@ def main():
         print("bencharness " + version("bencharness"))
         return
     from bench.run import main as run
-    parser = argparse.ArgumentParser(add_help=False)
+    parser = argparse.ArgumentParser(add_help=False, allow_abbrev=False)
     parser.add_argument("--workspace", type=Path, default=Path.cwd())
     selected, arguments = parser.parse_known_args()
     workspace = selected.workspace.resolve()

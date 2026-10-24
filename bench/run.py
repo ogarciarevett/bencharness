@@ -277,7 +277,7 @@ def import_pilot(trial_path, results_path):
 
 def main(argv=None):
     global TRIALS, RESULTS, OWNER, RUNS, QUEUE
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(allow_abbrev=False)
     parser.add_argument("--queue", action="store_true")
     parser.add_argument("--max", type=int, help="with --queue: record at most this many trials")
     parser.add_argument("--trial")
