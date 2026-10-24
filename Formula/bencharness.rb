@@ -8,8 +8,12 @@ class Bencharness < Formula
   sha256 "59d62b2fee3cfce798f3b251e9fa48404ee8fca72c193a8da1a0d923920204f3"
   license "Apache-2.0"
 
-  depends_on "python@3.15"
-  depends_on "python-setuptools" => :build
+  depends_on "python@3.12"
+
+  resource "setuptools" do
+    url "https://files.pythonhosted.org/packages/70/b3/c19426f783614d625699a4b247faf628ea9ab1db228674491767b417f9e1/setuptools-84.2.1.tar.gz"
+    sha256 "3ff8b3b5492a0aa66960f4419365a86b84e013070d4313e4d4a6894f5d64d6bc"
+  end
 
   def install
     virtualenv_install_with_resources
