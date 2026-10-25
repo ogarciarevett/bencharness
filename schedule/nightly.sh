@@ -30,7 +30,12 @@ python3 -m bench.run --queue --max 1 || fail "trial runner"
 [ -n "$(git status --porcelain -- results queue RESULTS.md README.md docs/charts)" ] || { echo "nothing new"; exit 0; }
 git add results queue RESULTS.md README.md docs/charts
 git commit -qm "nightly: records and candidates of $(date -u +%F)" || fail "commit"
+head=$(git rev-parse HEAD) || fail "read head"
+base=$(git rev-parse origin/main) || fail "read base"
+evidence=$(python3 -m bench.evidence "$base" "$head" "$tree/runs") || fail "verify records"
+printf '%s\n' "$evidence"
 git push -q -u origin "$branch" || fail "push $branch"
-gh pr create --repo "$slug" --head "$branch" --title "nightly: $(date -u +%F)" \
+pr=$(gh pr create --repo "$slug" --head "$branch" --title "nightly: $(date -u +%F)" \
   --body "Records and candidates written by the night run. The morning review checks them against the run files and merges." \
-  || fail "gh pr create"
+  ) || fail "gh pr create"
+gh pr edit "$pr" --repo "$slug" --body "$evidence" || fail "post evidence"
