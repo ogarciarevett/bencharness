@@ -20,6 +20,7 @@ if name == "git":
     elif "diff" in args: print("pinned diff")
     elif "status" in args: print(" M queue/candidates.jsonl")
 elif name == "python3":
+    if "bench.ci" in args: print(os.environ["CI_STATUS"])
     if "bench.evidence" in args:
         if os.environ.get("VERIFY_EXIT") == "1":
             print("FAIL: missing /Users/operator/private/run/result.json token=secret")
@@ -39,7 +40,7 @@ elif name == "codex":
 
 
 class MorningReview(unittest.TestCase):
-    def run_review(self, verdict="VERDICT: PASS", exit_code=0, script="review", verify_exit=0, edit_exit=0):
+    def run_review(self, verdict="VERDICT: PASS", exit_code=0, script="review", verify_exit=0, edit_exit=0, ci_status="success"):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "schedule").mkdir()
@@ -62,7 +63,7 @@ class MorningReview(unittest.TestCase):
             calls = root / "calls.jsonl"
             env = {**os.environ, "PATH": str(root / "bin") + ":" + os.environ["PATH"],
                    "CALLS": str(calls), "VERDICT": verdict, "REVIEW_EXIT": str(exit_code), "BENCH_REPORT_CMD": "cat",
-                   "SCRIPT": script, "VERIFY_EXIT": str(verify_exit), "EDIT_EXIT": str(edit_exit)}
+                   "SCRIPT": script, "VERIFY_EXIT": str(verify_exit), "EDIT_EXIT": str(edit_exit), "CI_STATUS": ci_status}
             done = subprocess.run(["sh", str(root / f"schedule/{script}.sh")], env=env, capture_output=True, text=True, timeout=20)
             expected = 1 if script == "nightly" and (verify_exit or edit_exit) else 0
             self.assertEqual(done.returncode, expected, done.stderr)
@@ -79,12 +80,18 @@ class MorningReview(unittest.TestCase):
         self.assertEqual(review[review.index("-s") + 1], "read-only")
         merge = next(c for c in calls if c[:3] == ["gh", "pr", "merge"])
         self.assertEqual(merge[merge.index("--match-head-commit") + 1], "a" * 40)
+        ci_check = next(c for c in calls if c[:3] == ["python3", "-m", "bench.ci"])
+        self.assertEqual(ci_check[3:], ["example/bencharness", "a" * 40])
 
     def test_review_posts_verified_evidence_before_reviewing(self):
         calls = self.run_review()
         edit = next(c for c in calls if c[:3] == ["gh", "pr", "edit"])
         self.assertIn("Evidence (head aaaaaaa)", edit[edit.index("--body") + 1])
         self.assertLess(calls.index(edit), next(i for i, c in enumerate(calls) if c[0] == "codex"))
+
+    def test_latest_ci_failure_cannot_merge(self):
+        calls = self.run_review(ci_status="failure")
+        self.assertFalse(any(c[:3] == ["gh", "pr", "merge"] for c in calls))
 
     def test_review_stops_if_verification_or_evidence_post_fails(self):
         for options in ({"verify_exit": 1}, {"edit_exit": 1}):

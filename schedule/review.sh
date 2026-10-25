@@ -41,7 +41,7 @@ End with exactly one last line: VERDICT: PASS or VERDICT: FAIL <one-sentence rea
   # CI on exactly the checked commit, waiting at most 30 minutes.
   ci=pending
   for i in $(seq 1 60); do
-    ci=$(gh api "repos/$slug/commits/$head/check-runs" -q '[.check_runs[] | .conclusion] | if length == 0 then "pending" elif all(. == "success") then "success" elif any(. == null) then "pending" else "failure" end' < /dev/null) || ci=pending
+    ci=$(python3 -m bench.ci "$slug" "$head" < /dev/null) || ci=pending
     [ "$ci" = pending ] || break
     sleep 30
   done
