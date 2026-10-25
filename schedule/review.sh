@@ -20,7 +20,7 @@ while read -r number branch; do
   base=$(git -C "$repo" rev-parse origin/main)
   checks=$(python3 -m bench.evidence "$base" "$head" "$tree/runs" < /dev/null 2>&1); verified=$?
   printf '%s\n' "$checks"
-  [ "$verified" = 0 ] || { reject "$(printf '%s' "$checks" | tr '\n' ' ')"; continue; }
+  [ "$verified" = 0 ] || { reject "deterministic verification failed; see the local review log"; continue; }
   gh pr edit "$number" --repo "$slug" --body "$checks" < /dev/null || { reject "cannot post evidence"; continue; }
   # The reviewer is a one-shot Codex session on the subscription, in a read-only sandbox with no
   # network: the diff and the check output are saved to files first, and it reads only those.

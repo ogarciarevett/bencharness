@@ -21,6 +21,9 @@ if name == "git":
     elif "status" in args: print(" M queue/candidates.jsonl")
 elif name == "python3":
     if "bench.evidence" in args:
+        if os.environ.get("VERIFY_EXIT") == "1":
+            print("FAIL: missing /Users/operator/private/run/result.json token=secret")
+            sys.exit(1)
         print("## Evidence (head aaaaaaa)\n\nRun summary: 2 new candidate(s); 0 new record(s).\nVerification: PASS")
         sys.exit(int(os.environ.get("VERIFY_EXIT", "0")))
 elif name == "gh":
@@ -89,6 +92,9 @@ class MorningReview(unittest.TestCase):
             self.assertFalse(any(c[:3] == ["gh", "pr", "merge"] or c[0] == "codex" for c in calls))
             if "verify_exit" in options:
                 self.assertFalse(any(c[:3] == ["gh", "pr", "edit"] for c in calls))
+                comment = next(c for c in calls if c[:3] == ["gh", "pr", "comment"])
+                self.assertNotIn("/Users/", comment[comment.index("--body") + 1])
+                self.assertNotIn("token=", comment[comment.index("--body") + 1])
 
     def test_nightly_posts_evidence_after_push_and_create(self):
         calls = self.run_review(script="nightly")
