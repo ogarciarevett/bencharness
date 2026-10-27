@@ -43,7 +43,7 @@ def adapter(name):
     return importlib.import_module("harnesses." + {"baseline": "baseline_harness", "baseline-native": "baseline_harness_native"}.get(name, name.replace("-", "_")))
 
 
-def sandboxed(argv, workdir, seam_socket=None):
+def sandboxed(argv, workdir, seam_socket=None, timeout=None):
     """No network but the seam socket, writes only in workdir, no reads in the home folder, an empty environment."""
     workdir = Path(workdir).resolve()
     (workdir / "tmp").mkdir(parents=True, exist_ok=True)
@@ -57,7 +57,7 @@ def sandboxed(argv, workdir, seam_socket=None):
     if seam_socket:
         profile += f'(allow network-outbound (remote unix-socket (path-literal "{Path(seam_socket).resolve()}")))'
         env["BENCH_SEAM"] = str(seam_socket)
-    return subprocess.run(["sandbox-exec", "-p", profile, *argv], capture_output=True, text=True, env=env, cwd=workdir)
+    return subprocess.run(["sandbox-exec", "-p", profile, *argv], capture_output=True, text=True, env=env, cwd=workdir, timeout=timeout)
 
 
 def fetch(spec, name, work):
