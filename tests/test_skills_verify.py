@@ -17,7 +17,7 @@ def complete_record(day='2026-10-27'):
 
 
 class SkillsVerification(unittest.TestCase):
-    def check_record(self, row, receipt=None, markdown=None):
+    def check_record(self, row, receipt=None, markdown=None, head_source=None):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp).resolve()
             local = root/row['run_id']
@@ -25,7 +25,7 @@ class SkillsVerification(unittest.TestCase):
             (local/'result.json').write_text(json.dumps(row if receipt is None else receipt))
             def show(ref, path):
                 if ref == 'base': return ''
-                if path == 'bench/skills.py': return Path(skills.__file__).read_text()
+                if path == 'bench/skills.py': return Path(skills.__file__).read_text() if head_source is None else head_source
                 if path.endswith('.json'): return json.dumps(row)
                 return skills.table(row['rows']) if markdown is None else markdown
             with patch.object(verify, 'changed_files', return_value={'results/skills/2026-10-27.json'}), \
@@ -38,6 +38,14 @@ class SkillsVerification(unittest.TestCase):
 
     def test_matching_complete_receipt_and_table_pass(self):
         self.assertEqual(self.check_record(complete_record()), [])
+
+    def test_executing_source_differs_from_result_head(self):
+        # A complete receipt is still invalid when it came from another source checkout.
+        for head_source in ('', Path(skills.__file__).read_text() + '\n# different runner\n'):
+            with self.subTest(missing_source=not head_source):
+                self.assertEqual(self.check_record(complete_record(), head_source=head_source), [
+                    'results/skills/2026-10-27.json: skill receipt source identity differs from result head'
+                ])
 
     def test_changed_receipt_and_header_only_table_fail(self):
         row = complete_record()

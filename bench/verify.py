@@ -114,6 +114,9 @@ def check_skills(base, head, runs):
             if not re.fullmatch(r'skills-'+Path(path).stem+r'-[0-9a-f]{12}', row['run_id']):
                 raise ValueError('invalid run id')
             identity = digest(show(head, 'bench/skills.py').encode() + json.dumps(PIN, sort_keys=True).encode())
+            if row['identity'] != identity:
+                problems.append(f'{path}: skill receipt source identity differs from result head')
+                continue
             validate_record(row, Path(path).stem, identity)
             local = Path(runs)/row['run_id']/'result.json'
             if any(p.is_symlink() for p in [local, *local.parents]):

@@ -3,8 +3,7 @@
 # and a separate one-shot Codex reviewer session (read-only sandbox, no network), then merge when both pass and CI is green.
 # On a fail the PR stays open with the reason as a comment, and BENCH_REPORT_CMD gets one line.
 set -u
-source_repo=$(cd "$(dirname "$0")/.." && pwd)
-repo=${BENCH_SCHEDULE_REPO:-$source_repo}
+repo=$(cd "$(dirname "$0")/.." && pwd)
 tree="$repo/runs/nightly-tree"
 exec >> "$repo/runs/review.log" 2>&1
 echo "== $(date -u +%FT%TZ) review"
@@ -19,7 +18,7 @@ while read -r number branch; do
   git -C "$repo" fetch -q origin "$branch" < /dev/null || { reject "cannot fetch $branch"; continue; }
   head=$(git -C "$repo" rev-parse FETCH_HEAD)
   base=$(git -C "$repo" rev-parse origin/main)
-  checks=$(cd "$source_repo" && python3 -m bench.evidence "$base" "$head" "$tree/runs" < /dev/null 2>&1); verified=$?
+  checks=$(python3 -m bench.evidence "$base" "$head" "$tree/runs" < /dev/null 2>&1); verified=$?
   printf '%s\n' "$checks"
   [ "$verified" = 0 ] || { reject "deterministic verification failed; see the local review log"; continue; }
   gh pr edit "$number" --repo "$slug" --body "$checks" < /dev/null || { reject "cannot post evidence"; continue; }

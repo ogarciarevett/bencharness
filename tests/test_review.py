@@ -20,9 +20,14 @@ if name == "git":
     elif "diff" in args: print("pinned diff")
     elif "status" in args: print(" M queue/candidates.jsonl")
 elif name == "python3":
-    if "bench.skills" in args: sys.exit(int(os.environ.get("SKILLS_EXIT", "0")))
+    if "bench.skills" in args:
+        assert pathlib.Path.cwd() == (pathlib.Path(os.environ["CALLS"]).parent / "runs/nightly-tree").resolve()
+        sys.exit(int(os.environ.get("SKILLS_EXIT", "0")))
     if "bench.ci" in args: print(os.environ["CI_STATUS"])
     if "bench.evidence" in args:
+        expected = pathlib.Path(os.environ["CALLS"]).parent
+        if os.environ["SCRIPT"] == "nightly": expected = expected / "runs/nightly-tree"
+        assert pathlib.Path.cwd() == expected.resolve()
         if os.environ.get("VERIFY_EXIT") == "1":
             print("FAIL: missing /Users/operator/private/run/result.json token=secret")
             sys.exit(1)
@@ -63,6 +68,8 @@ class MorningReview(unittest.TestCase):
                 path.write_text(path.read_text().replace("#!/usr/bin/env python3", "#!" + sys.executable))
             calls = root / "calls.jsonl"
             env = {**os.environ, "PATH": str(root / "bin") + ":" + os.environ["PATH"],
+                   "BENCH_SCHEDULE_REPO": str(root / "removed-state-override"),
+                   "BENCH_SKILLS_ROOT": str(root / "removed-source-override"),
                    "CALLS": str(calls), "VERDICT": verdict, "REVIEW_EXIT": str(exit_code), "BENCH_REPORT_CMD": "cat",
                    "SCRIPT": script, "VERIFY_EXIT": str(verify_exit), "EDIT_EXIT": str(edit_exit), "CI_STATUS": ci_status, "SKILLS_EXIT": str(skills_exit)}
             done = subprocess.run(["sh", str(root / f"schedule/{script}.sh")], env=env, capture_output=True, text=True, timeout=20)
