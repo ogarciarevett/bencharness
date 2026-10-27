@@ -110,3 +110,19 @@ class Skills(unittest.TestCase):
             with patch.object(skills, 'ROOT', root), patch.object(skills, 'installed'), contextlib.redirect_stdout(log):
                 self.assertEqual(skills.run('1900-01-01'), 0)
             self.assertEqual(log.getvalue(), 'already recorded: results/skills/1900-01-01.json\n')
+
+    def test_grader_launch_error_propagates_as_infrastructure_failure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            (root/'cache.py').write_text('')
+            with patch.object(skills, 'sandboxed', side_effect=OSError('/private/interpreter')):
+                with self.assertRaises(OSError): skills.score('diagnosing-bugs', root)
+
+    def test_grader_timeout_logs_category_only(self):
+        import subprocess
+        output = io.StringIO()
+        error = subprocess.TimeoutExpired(['/private/python'], 30)
+        with patch('sys.argv', ['skills']), patch.object(skills, 'run', side_effect=error), \
+             contextlib.redirect_stderr(output):
+            self.assertEqual(skills.main(), 1)
+        self.assertEqual(output.getvalue(), 'INCOMPLETE skills: TimeoutExpired\n')

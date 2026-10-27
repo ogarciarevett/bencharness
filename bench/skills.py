@@ -9,6 +9,7 @@ from pathlib import Path
 import re
 import shutil
 import stat
+import subprocess
 import contextlib
 import sys
 
@@ -112,18 +113,23 @@ def score(name, workspace):
                              0o600, dir_fd=parent)
                 with os.fdopen(fd, 'w') as stream:
                     stream.write(CODE_CHECKS[name])
-            done = sandboxed([str(Path(sys.executable).resolve()), str(workspace/'sealed-check.py')], workspace, timeout=30)
-            if done.returncode not in (0, 1):
-                raise RuntimeError('grading process failed')
-            return float(done.returncode == 0)
-        checks = [term in text for term in terms]
-        if name == 'domain-modeling':
-            regular_text(workspace, 'docs/adr/0001-reservation.md')
-        if name == 'writing-for-agents':
-            checks.append(len(text.split()) <= 200)
-        return sum(checks)/len(checks)
     except (OSError, ValueError):
         return 0.0
+    if name in CODE_CHECKS:
+        done = sandboxed([str(Path(sys.executable).resolve()), str(workspace/'sealed-check.py')], workspace, timeout=30)
+        if done.returncode not in (0, 1):
+            raise RuntimeError('grading process failed')
+        return float(done.returncode == 0)
+    checks = [term in text for term in terms]
+    if name == 'domain-modeling':
+        try:
+            regular_text(workspace, 'docs/adr/0001-reservation.md')
+            checks.append(True)
+        except (OSError, ValueError):
+            checks.append(False)
+    if name == 'writing-for-agents':
+        checks.append(len(text.split()) <= 200)
+    return sum(checks)/len(checks)
 
 
 def table(rows):
@@ -221,7 +227,7 @@ def main():
         RUNS=ROOT/'runs'
     if not re.fullmatch(r'\d{4}-\d{2}-\d{2}',args.date):parser.error('date must be YYYY-MM-DD')
     try:return run(args.date)
-    except (OSError,ValueError,KeyError,StopIteration,RuntimeError) as error:
+    except (OSError,ValueError,KeyError,StopIteration,RuntimeError,subprocess.SubprocessError) as error:
         print(f'INCOMPLETE skills: {type(error).__name__}',file=sys.stderr)
         return 1
 
