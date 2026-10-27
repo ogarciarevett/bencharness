@@ -100,7 +100,7 @@ def check_generated(head):
 
 
 def check_skills(base, head, runs):
-    from bench.skills import table
+    from bench.skills import table, validate_record, digest, PIN
     problems = []
     for path in changed_files(base, head):
         if not path.startswith('results/skills/'):
@@ -113,6 +113,8 @@ def check_skills(base, head, runs):
             row = json.loads(show(head, record_path))
             if not re.fullmatch(r'skills-'+Path(path).stem+r'-[0-9a-f]{12}', row['run_id']):
                 raise ValueError('invalid run id')
+            identity = digest(show(head, 'bench/skills.py').encode() + json.dumps(PIN, sort_keys=True).encode())
+            validate_record(row, Path(path).stem, identity)
             local = Path(runs)/row['run_id']/'result.json'
             if any(p.is_symlink() for p in [local, *local.parents]):
                 raise ValueError('run receipt ancestry contains a symlink')
@@ -120,8 +122,8 @@ def check_skills(base, head, runs):
                 problems.append(f'{path}: skill record differs from run receipt')
             if show(head, str(Path(path).with_suffix('.md'))) != table(row['rows']):
                 problems.append(f'{path}: skill table differs from record')
-        except (OSError, ValueError, KeyError) as error:
-            problems.append(f'{path}: cannot verify skill receipt: {error}')
+        except (OSError, ValueError, KeyError, TypeError) as error:
+            problems.append(f'{path}: cannot verify skill receipt: {type(error).__name__}')
     return problems
 
 

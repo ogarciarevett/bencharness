@@ -20,6 +20,7 @@ if name == "git":
     elif "diff" in args: print("pinned diff")
     elif "status" in args: print(" M queue/candidates.jsonl")
 elif name == "python3":
+    if "bench.skills" in args: sys.exit(int(os.environ.get("SKILLS_EXIT", "0")))
     if "bench.ci" in args: print(os.environ["CI_STATUS"])
     if "bench.evidence" in args:
         if os.environ.get("VERIFY_EXIT") == "1":
@@ -40,7 +41,7 @@ elif name == "codex":
 
 
 class MorningReview(unittest.TestCase):
-    def run_review(self, verdict="VERDICT: PASS", exit_code=0, script="review", verify_exit=0, edit_exit=0, ci_status="success"):
+    def run_review(self, verdict="VERDICT: PASS", exit_code=0, script="review", verify_exit=0, edit_exit=0, ci_status="success", skills_exit=0):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "schedule").mkdir()
@@ -63,9 +64,12 @@ class MorningReview(unittest.TestCase):
             calls = root / "calls.jsonl"
             env = {**os.environ, "PATH": str(root / "bin") + ":" + os.environ["PATH"],
                    "CALLS": str(calls), "VERDICT": verdict, "REVIEW_EXIT": str(exit_code), "BENCH_REPORT_CMD": "cat",
-                   "SCRIPT": script, "VERIFY_EXIT": str(verify_exit), "EDIT_EXIT": str(edit_exit), "CI_STATUS": ci_status}
+                   "SCRIPT": script, "VERIFY_EXIT": str(verify_exit), "EDIT_EXIT": str(edit_exit), "CI_STATUS": ci_status, "SKILLS_EXIT": str(skills_exit)}
             done = subprocess.run(["sh", str(root / f"schedule/{script}.sh")], env=env, capture_output=True, text=True, timeout=20)
-            expected = 1 if script == "nightly" and (verify_exit or edit_exit) else 0
+            if skills_exit:
+                self.assertIn('bencharness nightly failed: skills runner incomplete or deferred',
+                              (root/'runs/nightly.log').read_text())
+            expected = 1 if script == "nightly" and (verify_exit or edit_exit or skills_exit) else 0
             self.assertEqual(done.returncode, expected, done.stderr)
             return [json.loads(line) for line in calls.read_text().splitlines()]
 
@@ -125,3 +129,12 @@ class MorningReview(unittest.TestCase):
             with self.subTest(verdict=verdict):
                 calls = self.run_review(verdict)
                 self.assertFalse(any(c[:3] == ["gh", "pr", "merge"] for c in calls))
+
+    def test_nightly_reports_deferred_or_partial_skills_and_stops(self):
+        for status in (75, 1):
+            with self.subTest(status=status):
+                calls = self.run_review(script='nightly', skills_exit=status)
+                self.assertTrue(any('bench.skills' in c for c in calls))
+                self.assertFalse(any('bench.run' in c for c in calls))
+                self.assertFalse(any(c[0] == 'git' and ('commit' in c or 'push' in c) for c in calls))
+                self.assertFalse(any(c[:3] == ['gh', 'pr', 'create'] for c in calls))

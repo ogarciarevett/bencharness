@@ -31,7 +31,7 @@ class Skills(unittest.TestCase):
     def test_host_gate_defers_before_model(self):
         with patch.object(skills,'installed'), patch.object(skills.guard,'problems',return_value=['busy']), \
              patch.object(skills,'model_seam') as model, contextlib.redirect_stdout(io.StringIO()):
-            self.assertEqual(skills.run('1900-01-01'),0)
+            self.assertEqual(skills.run('1900-01-01'),75)
             model.assert_not_called()
 
     def test_model_error_is_not_a_completed_result(self):
@@ -105,9 +105,18 @@ class Skills(unittest.TestCase):
             output = root/'results/skills/1900-01-01.json'
             output.parent.mkdir(parents=True)
             identity = skills.digest(Path(skills.__file__).read_bytes() + json.dumps(skills.PIN, sort_keys=True).encode())
-            output.write_text(json.dumps(dict(identity=identity)))
+            record = dict(identity=identity, run_id=f'skills-1900-01-01-{identity[:12]}',
+                          pin=skills.PIN, settings=skills.SPEC, rows=[dict(name=name, task=task[0],
+                          **{arm: dict(status='complete', score=1, usage=dict(input_tokens=1, output_tokens=1),
+                                       wall_seconds=1) for arm in ('baseline', 'skill')})
+                          for name, task in skills.TASKS.items()])
+            output.write_text(json.dumps(record))
+            output.with_suffix('.md').write_text(skills.table(record['rows']))
+            saved = root/'runs'/record['run_id']
+            saved.mkdir(parents=True)
+            (saved/'result.json').write_text(json.dumps(record))
             log = io.StringIO()
-            with patch.object(skills, 'ROOT', root), patch.object(skills, 'installed'), contextlib.redirect_stdout(log):
+            with patch.object(skills, 'ROOT', root), patch.object(skills, 'RUNS', root/'runs'), patch.object(skills, 'installed'), contextlib.redirect_stdout(log):
                 self.assertEqual(skills.run('1900-01-01'), 0)
             self.assertEqual(log.getvalue(), 'already recorded: results/skills/1900-01-01.json\n')
 
@@ -126,3 +135,32 @@ class Skills(unittest.TestCase):
              contextlib.redirect_stderr(output):
             self.assertEqual(skills.main(), 1)
         self.assertEqual(output.getvalue(), 'INCOMPLETE skills: TimeoutExpired\n')
+
+    def test_lock_deferral_and_partial_stops_are_not_success(self):
+        for mode in ('lock', 'gate-after-pair', 'host-stop-after-pair'):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as tmp, contextlib.ExitStack() as stack:
+                root = Path(tmp).resolve()
+                stack.enter_context(patch.object(skills, 'ROOT', root))
+                stack.enter_context(patch.object(skills, 'RUNS', root/'runs'))
+                stack.enter_context(patch.object(skills, 'installed', return_value=root))
+                stack.enter_context(patch.object(skills, 'Path', side_effect=lambda value: root/'build.lock'
+                    if str(value) == '/Volumes/Studio/.cache/local-ci-build.lock' else Path(value)))
+                stack.enter_context(patch.object(skills.fcntl, 'flock', side_effect=BlockingIOError if mode == 'lock' else None))
+                gate = [[], [], [], ['busy']] if mode == 'gate-after-pair' else None
+                stack.enter_context(patch.object(skills.guard, 'problems', side_effect=gate, return_value=[]))
+                @contextlib.contextmanager
+                def model(*args): yield 'socket'
+                stack.enter_context(patch.object(skills, 'model_seam', model))
+                stack.enter_context(patch.object(skills.shutil, 'copytree'))
+                stack.enter_context(patch.object(skills, 'score', return_value=1))
+                metrics = dict(wall_seconds=1, usage=dict(input_tokens=1, output_tokens=1))
+                replies = [dict(ok=True), dict(metrics=metrics), dict(ok=True), dict(metrics=metrics),
+                           dict(ok=False, kind='StopPilot', error=skills.seam.HOST_STOP)]
+                request = stack.enter_context(patch.object(skills.seam, 'request', side_effect=replies))
+                log = stack.enter_context(contextlib.redirect_stdout(io.StringIO()))
+                self.assertEqual(skills.run('1900-01-01'), 75)
+                self.assertFalse((root/'results').exists())
+                receipts = list((root/'runs').rglob('result.json'))
+                self.assertEqual(len(receipts), 0 if mode == 'lock' else 2)
+                self.assertNotIn(str(root), log.getvalue())
+                if mode == 'lock': request.assert_not_called()

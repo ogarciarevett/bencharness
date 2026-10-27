@@ -29,7 +29,7 @@ cd "$tree" || fail "cd $tree"
 python3 -m bench.research || fail "research"
 # Run the skill pairs even when the older trial queue is blocked. During rollout the installed
 # source checkout may supply the runner before it has reached origin/main.
-(cd "${BENCH_SKILLS_ROOT:-$source_repo}" && python3 -m bench.skills --workspace "$tree") || fail "skills runner"
+(cd "${BENCH_SKILLS_ROOT:-$source_repo}" && python3 -m bench.skills --workspace "$tree") || fail "skills runner incomplete or deferred"
 python3 -m bench.run --queue --max 1 || fail "trial runner"
 [ -n "$(git status --porcelain -- results queue RESULTS.md README.md docs/charts)" ] || { echo "nothing new"; exit 0; }
 git add results queue RESULTS.md README.md docs/charts
