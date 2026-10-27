@@ -6,6 +6,7 @@ under RUNS_DIR, and RESULTS.md and the README table at HEAD_REF are exactly what
 from HEAD_REF's store. Otherwise exit 1 and one "FAIL: ..." line per problem.
 """
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -24,7 +25,7 @@ ALLOWED = {"results/trials.jsonl", "queue/candidates.jsonl", "RESULTS.md", "READ
 
 
 def allowed(path):
-    return path in ALLOWED or (path.startswith("docs/charts/") and
+    return path in ALLOWED or bool(re.fullmatch(r'results/skills/\d{4}-\d{2}-\d{2}\.(json|md)', path)) or (path.startswith("docs/charts/") and
                               (path.endswith(".svg") or Path(path).name == "README.md"))
 
 
@@ -98,6 +99,30 @@ def check_generated(head):
                 if before.get(name) != after.get(name)]
 
 
+def check_skills(base, head, runs):
+    from bench.skills import table
+    problems = []
+    for path in changed_files(base, head):
+        if not path.startswith('results/skills/'):
+            continue
+        if show(base, path):
+            problems.append(f'{path}: existing skill results are immutable')
+            continue
+        try:
+            record_path = str(Path(path).with_suffix('.json'))
+            row = json.loads(show(head, record_path))
+            if Path(row['run_id']).name != row['run_id']:
+                raise ValueError('invalid run id')
+            local = Path(runs)/row['run_id']/'result.json'
+            if json.loads(local.read_text()) != row:
+                problems.append(f'{path}: skill record differs from run receipt')
+            if show(head, str(Path(path).with_suffix('.md'))) != table(row['rows']):
+                problems.append(f'{path}: skill table differs from record')
+        except (OSError, ValueError, KeyError) as error:
+            problems.append(f'{path}: cannot verify skill receipt: {error}')
+    return problems
+
+
 def main(base, head, runs, any_files=False):
     outside = sorted(path for path in changed_files(base, head) if not allowed(path))
     # Never run code from a PR that changes code; --any-files is for a person checking a code PR's records.
@@ -105,7 +130,7 @@ def main(base, head, runs, any_files=False):
         print("FAIL: the PR changes files a nightly PR may not touch: " + ", ".join(outside))
         return 1
     records, problems = new_records(base, head)
-    problems += check_records(records, runs) + check_labels(records, head) + check_generated(head)
+    problems += check_records(records, runs) + check_labels(records, head) + check_generated(head) + check_skills(base, head, runs)
     for problem in problems:
         print("FAIL: " + problem)
     if not problems:

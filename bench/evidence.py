@@ -22,7 +22,7 @@ def main(base, head, runs):
     print(f"Run summary: {counts[0]} new candidate(s); {counts[1]} new record(s).")
     print("Verification: PASS — added records match local run files; RESULTS.md, README.md and charts regenerate.")
     print(f"Check: `python3 -m bench.verify {base} {head} <local-runs-dir>` (exit 0).")
-    print("Counts are additions relative to the checked base; no new records means no new benchmark result.")
+    print("Counts are additions relative to the checked base; no new records means no new trial-store benchmark result. Separate results/skills tables are checked against private run receipts.")
     return 0
 
 

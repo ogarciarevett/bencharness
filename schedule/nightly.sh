@@ -5,7 +5,8 @@
 # trial waits for the next night. BENCH_REPORT_CMD gets a line on stdin only on a failure or when a
 # candidate beats the baseline (schedule/report.sh by default).
 set -u
-repo=$(cd "$(dirname "$0")/.." && pwd)
+source_repo=$(cd "$(dirname "$0")/.." && pwd)
+repo=${BENCH_SCHEDULE_REPO:-$source_repo}
 tree="$repo/runs/nightly-tree"
 mkdir -p "$repo/runs"
 exec >> "$repo/runs/nightly.log" 2>&1
@@ -26,13 +27,16 @@ branch="nightly/$(date -u +%F)"
 git -C "$tree" reset -q --hard origin/main && git -C "$tree" checkout -q -B "$branch" origin/main || fail "checkout $branch"
 cd "$tree" || fail "cd $tree"
 python3 -m bench.research || fail "research"
+# Run the skill pairs even when the older trial queue is blocked. During rollout the installed
+# source checkout may supply the runner before it has reached origin/main.
+(cd "${BENCH_SKILLS_ROOT:-$source_repo}" && python3 -m bench.skills --workspace "$tree") || fail "skills runner"
 python3 -m bench.run --queue --max 1 || fail "trial runner"
 [ -n "$(git status --porcelain -- results queue RESULTS.md README.md docs/charts)" ] || { echo "nothing new"; exit 0; }
 git add results queue RESULTS.md README.md docs/charts
 git commit -qm "nightly: records and candidates of $(date -u +%F)" || fail "commit"
 head=$(git rev-parse HEAD) || fail "read head"
 base=$(git rev-parse origin/main) || fail "read base"
-evidence=$(python3 -m bench.evidence "$base" "$head" "$tree/runs") || fail "verify records"
+evidence=$(cd "$source_repo" && python3 -m bench.evidence "$base" "$head" "$tree/runs") || fail "verify records"
 printf '%s\n' "$evidence"
 git push -q -u origin "$branch" || fail "push $branch"
 pr=$(gh pr create --repo "$slug" --head "$branch" --title "nightly: $(date -u +%F)" \
