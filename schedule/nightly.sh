@@ -26,6 +26,8 @@ branch="nightly/$(date -u +%F)"
 git -C "$tree" reset -q --hard origin/main && git -C "$tree" checkout -q -B "$branch" origin/main || fail "checkout $branch"
 cd "$tree" || fail "cd $tree"
 python3 -m bench.research || fail "research"
+# Run and verify the same source from origin/main; install only after the skills PRs merge.
+python3 -m bench.skills --workspace "$tree" || fail "skills runner incomplete or deferred"
 python3 -m bench.run --queue --max 1 || fail "trial runner"
 [ -n "$(git status --porcelain -- results queue RESULTS.md README.md docs/charts)" ] || { echo "nothing new"; exit 0; }
 git add results queue RESULTS.md README.md docs/charts

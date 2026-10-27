@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 import fcntl
 import hashlib
 import json
+import math
 import os
 from pathlib import Path
 import re
@@ -142,6 +143,35 @@ def table(rows):
     return '\n'.join(lines)+'\n'
 
 
+def validate_record(record, day, identity):
+    """A daily success requires every pinned pair and its accounting fields."""
+    if (record['identity'] != identity or record['run_id'] != f'skills-{day}-{identity[:12]}'
+            or record['pin'] != PIN or record['settings'] != SPEC):
+        raise ValueError('skill benchmark identity or settings differ')
+    rows = record['rows']
+    if not isinstance(rows, list) or len(rows) != len(TASKS):
+        raise ValueError('incomplete skill task set')
+    if {row['name'] for row in rows} != set(TASKS):
+        raise ValueError('unexpected or duplicate skill task')
+    for row in rows:
+        if row['task'] != TASKS[row['name']][0]:
+            raise ValueError('skill task differs')
+        for arm in ('baseline', 'skill'):
+            result = row[arm]
+            if result['status'] != 'complete':
+                raise ValueError('incomplete skill arm')
+            for key in ('score', 'wall_seconds'):
+                value = result[key]
+                if type(value) not in (int, float) or not math.isfinite(value) or value < 0:
+                    raise ValueError('invalid skill metric')
+            if result['score'] > 1:
+                raise ValueError('invalid skill score')
+            for key in ('input_tokens', 'output_tokens'):
+                value = result['usage'][key]
+                if type(value) is not int or value < 0:
+                    raise ValueError('invalid skill token count')
+
+
 def run(day):
     plugin = installed()
     identity = digest(Path(__file__).read_bytes() + json.dumps(PIN,sort_keys=True).encode())
@@ -149,14 +179,17 @@ def run(day):
     saved = RUNS/run_id
     output = ROOT/'results/skills'/f'{day}.json'
     if output.exists():
-        if json.loads(output.read_text())['identity'] != identity:
-            raise ValueError('existing daily result belongs to a different benchmark')
+        record = json.loads(output.read_text())
+        validate_record(record, day, identity)
+        if (json.loads((saved/'result.json').read_text()) != record
+                or output.with_suffix('.md').read_text() != table(record['rows'])):
+            raise ValueError('existing daily result differs from receipt or table')
         print(f'already recorded: {output.relative_to(ROOT)}')
         return 0
     busy = guard.problems()
     if busy:
         print('DEFERRED skills: host gate', flush=True)
-        return 0
+        return 75
     saved.mkdir(parents=True,exist_ok=True)
     lock_path = Path('/Volumes/Studio/.cache/local-ci-build.lock')
     lock_path.parent.mkdir(parents=True,exist_ok=True)
@@ -166,7 +199,7 @@ def run(day):
             fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
         except BlockingIOError:
             print('DEFERRED skills: shared build lock is held',flush=True)
-            return 0
+            return 75
         for index,(name,(task,prompt,files,_,_)) in enumerate(TASKS.items()):
             row=dict(name=name,task=task)
             # Alternate pair order across skills; identical task, cap and settings on both sides.
@@ -180,7 +213,7 @@ def run(day):
                 busy=guard.problems()
                 if busy:
                     print('DEFERRED skills: host gate',flush=True)
-                    return 0
+                    return 75
                 workspace=side/task/'workspace'
                 if workspace.exists():shutil.rmtree(workspace)
                 workspace.mkdir(parents=True)
@@ -200,13 +233,14 @@ def run(day):
                     if not reply['ok']:
                         # Model/auth errors are infrastructure failures, never a zero score.
                         print(f"INCOMPLETE skills: {name}/{arm}: model error",flush=True)
-                        return 0 if reply['error']==seam.HOST_STOP else 1
+                        return 75 if reply['error']==seam.HOST_STOP else 1
                     metrics=seam.request('metrics',task=task)['metrics']
                 value=dict(status='complete',score=score(name,workspace),**metrics)
                 receipt.write_text(json.dumps(value,indent=2)+'\n')
                 row[arm]=value
             rows.append(row)
     result=dict(identity=identity,run_id=run_id,recorded_utc=datetime.now(timezone.utc).isoformat(),pin=PIN,settings=SPEC,rows=rows)
+    validate_record(result, day, identity)
     saved.joinpath('result.json').write_text(json.dumps(result,indent=2)+'\n')
     output.parent.mkdir(parents=True,exist_ok=True)
     shutil.copy2(saved/'result.json',output)
@@ -227,7 +261,7 @@ def main():
         RUNS=ROOT/'runs'
     if not re.fullmatch(r'\d{4}-\d{2}-\d{2}',args.date):parser.error('date must be YYYY-MM-DD')
     try:return run(args.date)
-    except (OSError,ValueError,KeyError,StopIteration,RuntimeError,subprocess.SubprocessError) as error:
+    except (OSError,ValueError,KeyError,TypeError,StopIteration,RuntimeError,subprocess.SubprocessError) as error:
         print(f'INCOMPLETE skills: {type(error).__name__}',file=sys.stderr)
         return 1
 
