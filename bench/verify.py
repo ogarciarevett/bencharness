@@ -111,9 +111,11 @@ def check_skills(base, head, runs):
         try:
             record_path = str(Path(path).with_suffix('.json'))
             row = json.loads(show(head, record_path))
-            if Path(row['run_id']).name != row['run_id']:
+            if not re.fullmatch(r'skills-'+Path(path).stem+r'-[0-9a-f]{12}', row['run_id']):
                 raise ValueError('invalid run id')
             local = Path(runs)/row['run_id']/'result.json'
+            if any(p.is_symlink() for p in [local, *local.parents]):
+                raise ValueError('run receipt ancestry contains a symlink')
             if json.loads(local.read_text()) != row:
                 problems.append(f'{path}: skill record differs from run receipt')
             if show(head, str(Path(path).with_suffix('.md'))) != table(row['rows']):
