@@ -41,6 +41,7 @@ class Skills(unittest.TestCase):
             def model(*args):yield 'socket'
             with patch.object(skills,'ROOT',root), patch.object(skills,'RUNS',root/'runs'), \
                  patch.object(skills,'installed',return_value=root), patch.object(skills.guard,'problems',return_value=[]), \
+                 patch.object(skills,'Path',side_effect=lambda value: root/'build.lock' if str(value)=='/Volumes/Studio/.cache/local-ci-build.lock' else Path(value)), \
                  patch.object(skills,'model_seam',model), patch.object(skills.fcntl,'flock'), \
                  patch.object(skills.seam,'request',return_value=dict(ok=False,kind='StopPilot',error='quota exceeded')), \
                  contextlib.redirect_stdout(io.StringIO()):
