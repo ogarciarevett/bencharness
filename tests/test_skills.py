@@ -55,3 +55,58 @@ class Skills(unittest.TestCase):
             (root/'cache.py').write_text('')
             with patch.object(skills,'sandboxed',return_value=SimpleNamespace(returncode=71,stderr='interpreter unavailable')):
                 with self.assertRaises(RuntimeError):skills.score('diagnosing-bugs',root)
+
+    def test_planted_grader_files_never_overwrite_host_file(self):
+        for kind in ('symlink', 'hardlink', 'regular'):
+            with self.subTest(kind=kind), tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp).resolve()
+                workspace = root/'workspace'
+                workspace.mkdir()
+                (workspace/'cache.py').write_text('')
+                victim = root/'private.txt'
+                victim.write_text('untouched')
+                check = workspace/'sealed-check.py'
+                if kind == 'symlink': check.symlink_to(victim)
+                elif kind == 'hardlink':
+                    import os
+                    os.link(victim, check)
+                else: check.write_text('untouched')
+                with patch.object(skills, 'sandboxed') as sandbox:
+                    self.assertEqual(skills.score('diagnosing-bugs', workspace), 0)
+                    sandbox.assert_not_called()
+                self.assertEqual(victim.read_text(), 'untouched')
+                self.assertEqual(check.read_text(), 'untouched')
+
+    def test_symlinked_workspace_ancestry_and_nonregular_outputs_fail(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            real = root/'real'
+            real.mkdir()
+            (real/'cache.py').write_text('')
+            (root/'link').symlink_to(real, target_is_directory=True)
+            with patch.object(skills, 'sandboxed') as sandbox:
+                self.assertEqual(skills.score('diagnosing-bugs', root/'link'), 0)
+                sandbox.assert_not_called()
+            import os
+            os.mkfifo(real/'RESEARCH.md')
+            self.assertEqual(skills.score('research', real), 0)
+
+    def test_setup_error_logs_category_only(self):
+        output = io.StringIO()
+        with patch('sys.argv', ['skills']), patch.object(skills, 'run', side_effect=OSError('/private/token')), \
+             contextlib.redirect_stderr(output):
+            self.assertEqual(skills.main(), 1)
+        self.assertEqual(output.getvalue(), 'INCOMPLETE skills: OSError\n')
+
+    def test_existing_result_logs_relative_path(self):
+        import json
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp).resolve()
+            output = root/'results/skills/1900-01-01.json'
+            output.parent.mkdir(parents=True)
+            identity = skills.digest(Path(skills.__file__).read_bytes() + json.dumps(skills.PIN, sort_keys=True).encode())
+            output.write_text(json.dumps(dict(identity=identity)))
+            log = io.StringIO()
+            with patch.object(skills, 'ROOT', root), patch.object(skills, 'installed'), contextlib.redirect_stdout(log):
+                self.assertEqual(skills.run('1900-01-01'), 0)
+            self.assertEqual(log.getvalue(), 'already recorded: results/skills/1900-01-01.json\n')

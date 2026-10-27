@@ -8,6 +8,8 @@ import os
 from pathlib import Path
 import re
 import shutil
+import stat
+import contextlib
 import sys
 
 from bench import guard, seam
@@ -70,28 +72,58 @@ def installed():
     return root
 
 
+@contextlib.contextmanager
+def directory(path):
+    """Open every ancestry component without following model-created symlinks."""
+    path = Path(path).absolute()
+    fd = os.open(path.anchor, os.O_RDONLY | os.O_DIRECTORY)
+    try:
+        for part in path.parts[1:]:
+            child = os.open(part, os.O_RDONLY | os.O_DIRECTORY | os.O_NOFOLLOW, dir_fd=fd)
+            os.close(fd)
+            fd = child
+        yield fd
+    finally:
+        os.close(fd)
+
+
+def regular_text(workspace, relative):
+    path = workspace/relative
+    if not path.resolve().is_relative_to(workspace.resolve()):
+        raise ValueError('output outside workspace')
+    with directory(path.parent) as parent:
+        if not stat.S_ISREG(os.stat(path.name, dir_fd=parent, follow_symlinks=False).st_mode):
+            raise ValueError('output is not regular')
+        fd = os.open(path.name, os.O_RDONLY | os.O_NOFOLLOW | os.O_NONBLOCK, dir_fd=parent)
+        with os.fdopen(fd) as stream:
+            if not stat.S_ISREG(os.fstat(stream.fileno()).st_mode):
+                raise ValueError('output is not regular')
+            return stream.read()
+
+
 def score(name, workspace):
     _, _, _, output, terms = TASKS[name]
-    path = workspace/output
-    if any(p.is_symlink() for p in [path, *path.parents]) or not path.is_file():
+    try:
+        text = regular_text(workspace, output).lower()
+        if name in CODE_CHECKS:
+            # Exclusive creation also rejects hardlinks and pre-existing grader files.
+            with directory(workspace) as parent:
+                fd = os.open('sealed-check.py', os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW,
+                             0o600, dir_fd=parent)
+                with os.fdopen(fd, 'w') as stream:
+                    stream.write(CODE_CHECKS[name])
+            done = sandboxed([str(Path(sys.executable).resolve()), str(workspace/'sealed-check.py')], workspace, timeout=30)
+            if done.returncode not in (0, 1):
+                raise RuntimeError('grading process failed')
+            return float(done.returncode == 0)
+        checks = [term in text for term in terms]
+        if name == 'domain-modeling':
+            regular_text(workspace, 'docs/adr/0001-reservation.md')
+        if name == 'writing-for-agents':
+            checks.append(len(text.split()) <= 200)
+        return sum(checks)/len(checks)
+    except (OSError, ValueError):
         return 0.0
-    text = path.read_text().lower()
-    if name in CODE_CHECKS:
-        # Never execute submitted code in the host process; the existing adapter sandbox blocks
-        # network and home reads and allows writes only in this private grading workspace.
-        check = workspace/'sealed-check.py'
-        check.write_text(CODE_CHECKS[name])
-        done = sandboxed([str(Path(sys.executable).resolve()), str(check)], workspace, timeout=30)
-        if done.returncode not in (0, 1):
-            raise RuntimeError('grading process failed: '+done.stderr[-500:])
-        return float(done.returncode == 0)
-    checks = [term in text for term in terms]
-    if name == 'domain-modeling':
-        adr = workspace/'docs/adr/0001-reservation.md'
-        checks.append(not adr.is_symlink() and adr.is_file())
-    if name == 'writing-for-agents':
-        checks.append(len(text.split()) <= 200)
-    return sum(checks)/len(checks)
 
 
 def table(rows):
@@ -113,11 +145,11 @@ def run(day):
     if output.exists():
         if json.loads(output.read_text())['identity'] != identity:
             raise ValueError('existing daily result belongs to a different benchmark')
-        print(f'already recorded: {output}')
+        print(f'already recorded: {output.relative_to(ROOT)}')
         return 0
     busy = guard.problems()
     if busy:
-        print('DEFERRED skills: '+'; '.join(busy), flush=True)
+        print('DEFERRED skills: host gate', flush=True)
         return 0
     saved.mkdir(parents=True,exist_ok=True)
     lock_path = Path('/Volumes/Studio/.cache/local-ci-build.lock')
@@ -141,7 +173,7 @@ def run(day):
                     continue
                 busy=guard.problems()
                 if busy:
-                    print('DEFERRED skills: '+'; '.join(busy),flush=True)
+                    print('DEFERRED skills: host gate',flush=True)
                     return 0
                 workspace=side/task/'workspace'
                 if workspace.exists():shutil.rmtree(workspace)
@@ -161,7 +193,7 @@ def run(day):
                     reply=seam.request('call',task=task,workspace=str(workspace),prompt=instructions,label=arm)
                     if not reply['ok']:
                         # Model/auth errors are infrastructure failures, never a zero score.
-                        print(f"INCOMPLETE skills: {name}/{arm}: {reply['kind']}: {reply['error'][-500:]}",flush=True)
+                        print(f"INCOMPLETE skills: {name}/{arm}: model error",flush=True)
                         return 0 if reply['error']==seam.HOST_STOP else 1
                     metrics=seam.request('metrics',task=task)['metrics']
                 value=dict(status='complete',score=score(name,workspace),**metrics)
@@ -174,7 +206,7 @@ def run(day):
     shutil.copy2(saved/'result.json',output)
     output.with_suffix('.md').write_text(table(rows))
     print(table(rows),flush=True)
-    print(f'RECORDED skills: {output}',flush=True)
+    print(f'RECORDED skills: {output.relative_to(ROOT)}',flush=True)
     return 0
 
 
@@ -189,8 +221,8 @@ def main():
         RUNS=ROOT/'runs'
     if not re.fullmatch(r'\d{4}-\d{2}-\d{2}',args.date):parser.error('date must be YYYY-MM-DD')
     try:return run(args.date)
-    except (OSError,ValueError,KeyError,StopIteration) as error:
-        print(f'INCOMPLETE skills: {type(error).__name__}: {error}',file=sys.stderr)
+    except (OSError,ValueError,KeyError,StopIteration,RuntimeError) as error:
+        print(f'INCOMPLETE skills: {type(error).__name__}',file=sys.stderr)
         return 1
 
 
