@@ -25,3 +25,7 @@ include = ["bench*", "harnesses*", "suites*", "schedule"]
 [tool.setuptools.package-data]
 "*" = ["*.json", "*.md"]
 schedule = ["codex-safe", "launcher.c"]
+
+[tool.ruff.lint]
+# SIM116: replace a chain of if/elif comparisons on one value with a dict lookup.
+select = ["SIM116"]
